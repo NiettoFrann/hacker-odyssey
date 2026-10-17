@@ -1,0 +1,11 @@
+# Nmap 7.991 scan initiated Sat Oct 17 11:16:12 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN loot/puertos.txt 10.129.58.25
+Warning: 10.129.58.25 giving up on port because retransmission cap hit (6).
+Nmap scan report for 10.129.58.25
+Host is up (0.24s latency).
+Not shown: 65532 closed tcp ports (conn-refused)
+PORT      STATE    SERVICE
+23/tcp    open     telnet
+10281/tcp filtered unknown
+31744/tcp filtered unknown
+
+# Nmap done at Sat Oct 17 11:16:31 2026 -- 1 IP address (1 host up) scanned in 19.01 seconds
