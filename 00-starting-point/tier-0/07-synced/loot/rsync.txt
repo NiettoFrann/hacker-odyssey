@@ -1,0 +1,16 @@
+rsync 10.129.228.37::
+public         	Anonymous Share
+
+rsync 10.129.228.37::public
+drwxr-xr-x          4,096 2022/10/24 19:02:23 .
+-rw-r--r--             33 2022/10/24 18:32:03 flag.txt
+
+rsync -av rsync://10.129.228.37/public/ ./
+receiving incremental file list
+./
+
+sent 27 bytes  received 81 bytes  11.37 bytes/sec
+total size is 33  speedup is 0.31
+
+cat flag.txt
+72eaf5344ebb84908ae543a719830519
