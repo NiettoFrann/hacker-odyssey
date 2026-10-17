@@ -1,0 +1,6 @@
+PING 10.129.58.34 (10.129.58.34) 56(84) bytes of data.
+64 bytes from 10.129.58.34: icmp_seq=1 ttl=63 time=238 ms
+
+--- 10.129.58.34 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 238.202/238.202/238.202/0.000 ms
