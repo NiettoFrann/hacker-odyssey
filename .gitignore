@@ -1,0 +1,35 @@
+# Credenciales y configuración local
+.env
+*.env
+*.key
+*.pem
+credentials*
+*.ovpn
+
+# Flags de HTB (no se publican)
+user.txt
+root.txt
+
+# Loot y archivos descargados de las máquinas
+loot/
+downloads/
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.pcap
+*.pcapng
+
+# Salidas de herramientas
+scans/
+*.nmap
+*.gnmap
+*.xml.scan
+
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
