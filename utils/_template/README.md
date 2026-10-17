@@ -148,7 +148,6 @@ find / -perm -4000 -type f 2>/dev/null
 | `user.txt` | `<redactada>`       |
 | `root.txt` | `<redactada>`       |
 
-> Las flags no se publican (ver `.gitignore`).
 
 ## Vulnerabilidades identificadas
 
