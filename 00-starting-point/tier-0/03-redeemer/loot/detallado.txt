@@ -1,0 +1,9 @@
+# Nmap 7.991 scan initiated Sat Oct 17 12:58:22 2026 as: nmap -p6379 -sCV -Pn -n -T4 -oN detallado.txt 10.129.136.187
+Nmap scan report for 10.129.136.187
+Host is up (0.24s latency).
+
+PORT     STATE SERVICE VERSION
+6379/tcp open  redis   Redis key-value store 5.0.7
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 17 12:58:29 2026 -- 1 IP address (1 host up) scanned in 7.44 seconds
