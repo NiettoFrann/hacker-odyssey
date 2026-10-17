@@ -6,12 +6,7 @@
 credentials*
 *.ovpn
 
-# Flags de HTB (no se publican)
-user.txt
-root.txt
-
 # Loot y archivos descargados de las máquinas
-loot/
 downloads/
 *.zip
 *.tar
