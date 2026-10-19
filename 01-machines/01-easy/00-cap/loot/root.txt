@@ -1,0 +1,2 @@
+root@cap:~# cat /root/root.txt 
+24060fc87747fad93134cdca35175e32
