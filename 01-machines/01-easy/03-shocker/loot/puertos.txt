@@ -1,0 +1,9 @@
+# Nmap 7.992 scan initiated Tue Oct 20 11:59:55 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN loot/puertos.txt 10.129.95.234
+Nmap scan report for 10.129.95.234
+Host is up (0.17s latency).
+Not shown: 65533 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+80/tcp   open  http
+2222/tcp open  EtherNetIP-1
+
+# Nmap done at Tue Oct 20 12:00:10 2026 -- 1 IP address (1 host up) scanned in 15.20 seconds
