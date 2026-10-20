@@ -1,0 +1,74 @@
+# Nmap 7.992 scan initiated Mon Oct 19 19:45:32 2026 as: nmap -p21,22,53,80,139,443,445 -sCV -Pn -n -T4 -oN loot/detallado.txt 10.129.86.28
+Nmap scan report for 10.129.86.28
+Host is up (0.16s latency).
+
+PORT    STATE SERVICE     VERSION
+21/tcp  open  ftp         vsftpd 3.0.3
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+22/tcp  open  ssh         OpenSSH 7.6p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+| ssh-hostkey: 
+|   2048 a9:68:24:bc:97:1f:1e:54:a5:80:45:e7:4c:d9:aa:a0 (RSA)
+|   256 e5:44:01:46:ee:7a:bb:7c:e9:1a:cb:14:99:9e:2b:8e (ECDSA)
+|_  256 00:4e:1a:4f:33:e8:a0:de:86:a6:e4:2a:5f:84:61:2b (ED25519)
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+53/tcp  open  domain      ISC BIND 9.11.3-1ubuntu1.2 (Ubuntu Linux)
+| dns-nsid: 
+|   bind.version: 
+|_    9.11.3-1ubuntu1.2-Ubuntu
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+80/tcp  open  http        Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: ERROR: Script execution failed (use -d to debug)
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+|_https-redirect: ERROR: Script execution failed (use -d to debug)
+|_hnap-info: ERROR: Script execution failed (use -d to debug)
+|_http-trane-info: ERROR: Script execution failed (use -d to debug)
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+|_http-title: Friend Zone Escape software
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+443/tcp open  ssl/http    Apache httpd 2.4.29
+| ssl-cert: Subject: commonName=friendzone.red/organizationName=CODERED/stateOrProvinceName=CODERED/countryName=JO
+| Not valid before: 2018-10-05T21:02:30
+|_Not valid after:  2018-11-04T21:02:30
+|_http-server-header: ERROR: Script execution failed (use -d to debug)
+|_ssl-date: TLS randomness does not represent time
+|_http-title: 404 Not Found
+|_http-trane-info: ERROR: Script execution failed (use -d to debug)
+| tls-alpn: 
+|_  http/1.1
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+|_hnap-info: ERROR: Script execution failed (use -d to debug)
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+445/tcp open  netbios-ssn Samba smbd 4.7.6-Ubuntu (workgroup: WORKGROUP)
+|_rpcinfo: ERROR: Script execution failed (use -d to debug)
+|_vmware-version: ERROR: Script execution failed (use -d to debug)
+Service Info: Hosts: FRIENDZONE, 127.0.1.1; OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Host script results:
+|_clock-skew: mean: -1h00m30s, deviation: 1h43m54s, median: -31s
+| smb-os-discovery: 
+|   OS: Windows 6.1 (Samba 4.7.6-Ubuntu)
+|   Computer name: friendzone
+|   NetBIOS computer name: FRIENDZONE\x00
+|   Domain name: \x00
+|   FQDN: friendzone
+|_  System time: 2026-10-20T01:45:16+03:00
+| smb2-time: 
+|   date: 2026-10-19T22:45:16
+|_  start_date: N/A
+|_nbstat: NetBIOS name: FRIENDZONE, NetBIOS user: <unknown>, NetBIOS MAC: <unknown> (unknown)
+| smb2-security-mode: 
+|   3.1.1: 
+|_    Message signing enabled but not required
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Oct 19 19:45:55 2026 -- 1 IP address (1 host up) scanned in 22.86 seconds
