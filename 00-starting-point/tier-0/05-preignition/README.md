@@ -1,170 +1,175 @@
 ---
-title: Preignition
+report_id: HO-0004-00
+target: Preignition
+platform: Hack The Box
 os: Linux
-dificultad: Very Easy
+difficulty: Very Easy
 ip: 10.129.58.34
-fecha: 2026-10-17
-categoria: Starting Point
-estado: completada
-tags: [htb, linux, nginx, default-credentials, broken-access-control]
+date: 2026-10-17
+version: 1.0
+author: Francisco Nieto
+status: Final
+tags: [htb, linux, very-easy, starting-point, nginx, default-credentials]
 ---
 
-# Preignition — Informe de Pentest
+# Informe de Prueba de Penetración — Preignition
 
-> Writeup de la máquina **Preignition** de [Hack The Box](https://www.hackthebox.com/). Documento con fines educativos, realizado en un entorno de laboratorio autorizado.
+| | |
+|---|---|
+| **ID de informe** | HO-0004-00 |
+| **Objetivo** | Preignition (`10.129.58.34`) |
+| **Plataforma** | Hack The Box — Starting Point (Tier 0) |
+| **Tipo de prueba** | Caja negra (black box) |
+| **Fecha de ejecución** | 2026-10-17 |
+| **Autor** | Francisco Nieto — [@NiettoFrann](https://github.com/NiettoFrann) |
+| **Versión** | 1.0 |
+| **Clasificación** | Público — uso educativo |
 
-## Información general
+> **Aviso legal.** Las pruebas se realizaron sobre un entorno de laboratorio autorizado
+> (Hack The Box). Ninguna técnica descrita debe aplicarse sobre sistemas sin autorización
+> expresa por escrito de su propietario.
 
-| Campo                   | Detalle        |
-| ----------------------- | -------------- |
-| **Máquina**             | Preignition    |
-| **Sistema operativo**   | Linux          |
-| **Dificultad**          | Very Easy      |
-| **Categoría**           | Starting Point |
-| **Dirección IP**        | `10.129.58.34` |
-| **Fecha de resolución** | 2026-10-17     |
-| **Autor del informe**   | NiettoFrann    |
-| **Estado**              | Completada     |
+### Control de versiones
+
+| Versión | Fecha | Descripción |
+|---------|-------|-------------|
+| 1.0 | 2026-10-17 | Versión inicial |
+
+---
 
 ## Índice
 
-1. [Resumen ejecutivo](#resumen-ejecutivo)
-2. [Alcance y metodología](#alcance-y-metodología)
-3. [Cadena de ataque](#cadena-de-ataque)
-4. [Reconocimiento](#reconocimiento)
-5. [Enumeración](#enumeración)
-6. [Explotación (Foothold)](#explotación-foothold)
-7. [Escalada de privilegios](#escalada-de-privilegios)
-8. [Flags](#flags)
-9. [Vulnerabilidades identificadas](#vulnerabilidades-identificadas)
-10. [Recomendaciones de mitigación](#recomendaciones-de-mitigación)
-11. [Lecciones aprendidas](#lecciones-aprendidas)
-12. [Herramientas utilizadas](#herramientas-utilizadas)
-13. [Evidencia](#evidencia)
-14. [Referencias](#referencias)
+1. [Resumen ejecutivo](#1-resumen-ejecutivo)
+2. [Alcance y metodología](#2-alcance-y-metodología)
+3. [Narrativa del ataque](#3-narrativa-del-ataque)
+4. [Hallazgos técnicos](#4-hallazgos-técnicos)
+5. [Post-explotación](#5-post-explotación)
+6. [Conclusiones](#6-conclusiones)
+7. [Anexos](#7-anexos)
 
 ---
 
-## Resumen ejecutivo
+## 1. Resumen ejecutivo
 
-La máquina `Preignition` se comprometió a través de un panel de administración web protegido con **credenciales por defecto**.
+### 1.1 Objetivo
 
-- El único puerto abierto es el **80/tcp (HTTP)**, con un servidor `nginx 1.14.2` sirviendo la página por defecto.
-- La enumeración de directorios con `gobuster` reveló un panel `admin.php` no enlazado desde la web principal.
-- El panel aceptó las credenciales triviales/por defecto `admin:admin`, lo que permitió el acceso sin necesidad de explotar ninguna vulnerabilidad de software, y mostró la flag directamente en la página.
+Evaluar la seguridad del host **Preignition** simulando un atacante externo sin
+credenciales ni conocimiento previo del entorno, con el fin de obtener el máximo nivel de
+acceso posible.
 
-**Impacto:** cualquier persona que descubra la ruta `/admin.php` puede iniciar sesión con credenciales triviales y acceder al panel de administración de la aplicación.
+### 1.2 Resultado
 
-## Alcance y metodología
+> El servidor publica un sitio web cuya portada es genérica, pero que incluye un panel de
+> administración oculto, no enlazado desde ninguna página. Ese panel está protegido con
+> el usuario y la contraseña más comunes (`admin`/`admin`), por lo que cualquiera que lo
+> encuentre puede entrar. Un atacante real podría manipular la aplicación y acceder a su
+> información con privilegios de administrador.
 
-- **Objetivo:** `10.129.58.34` (Preignition)
-- **Tipo de prueba:** caja negra, sin credenciales previas.
-- **Metodología:** Reconocimiento → Enumeración → Explotación → Post-explotación / Escalada de privilegios → Documentación.
-- **Entorno:** conexión a la VPN de HTB desde Linux.
+**Nivel de riesgo global:** `CRÍTICO`
 
-## Cadena de ataque
+### 1.3 Distribución de hallazgos
 
-```text
-Ping (TTL 63 → Linux) -> Escaneo de 65535 puertos (solo 80/tcp) -> Escaneo detallado (nginx 1.14.2)
-  -> Fuzzing de directorios (gobuster) -> Descubrimiento de /admin.php -> Login con credenciales por defecto (admin:admin)
-  -> Acceso al panel -> Flag visible en la página
+| Crítica | Alta | Media | Baja | Informativa |
+|:-------:|:----:|:-----:|:----:|:-----------:|
+| 1 | 0 | 0 | 0 | 0 |
+
+### 1.4 Resumen de hallazgos
+
+| ID | Hallazgo | Severidad | CVSS |
+|----|----------|-----------|------|
+| [HO-0004-01](#ho-0004-01--panel-de-administración-con-credenciales-por-defecto) | Panel de administración con credenciales por defecto | Crítica | 9.8 |
+
+### 1.5 Recomendaciones prioritarias
+
+1. Cambiar de inmediato las credenciales por defecto y exigir contraseñas robustas con bloqueo tras intentos fallidos.
+2. Restringir el acceso al panel de administración por VPN, firewall o lista de IP permitidas.
+3. No depender de ocultar rutas como medida de seguridad; añadir autenticación multifactor.
+
+---
+
+## 2. Alcance y metodología
+
+### 2.1 Alcance
+
+| Activo | Dirección | Incluido |
+|--------|-----------|:--------:|
+| Preignition | `10.129.58.34` | Sí |
+
+**Fuera de alcance:** ataques de denegación de servicio, infraestructura de la
+plataforma y otros jugadores.
+
+### 2.2 Metodología
+
+La prueba siguió las fases del estándar **PTES** (Penetration Testing Execution
+Standard), apoyándose en **OWASP WSTG** para los componentes web:
+
+1. **Reconocimiento** — descubrimiento de puertos y servicios.
+2. **Enumeración** — identificación de versiones y contenido web oculto.
+3. **Análisis de vulnerabilidades** — validación manual de autenticación débil.
+4. **Explotación** — obtención de acceso inicial.
+5. **Post-explotación** — recolección de evidencia.
+6. **Reporte** — documentación de hallazgos y recomendaciones.
+
+### 2.3 Entorno del auditor
+
+| Componente | Detalle |
+|------------|---------|
+| Sistema | Linux (kernel 7.2.11-zen1-1-zen) |
+| Conexión | VPN de Hack The Box |
+| Herramientas | ping, nmap 7.991, gobuster 3.8.2, navegador web |
+
+### 2.4 Clasificación de severidad
+
+Las vulnerabilidades se puntúan con **CVSS v3.1** (ver tabla de criterios estándar).
+
+---
+
+## 3. Narrativa del ataque
+
+### 3.1 Cadena de compromiso
+
+```mermaid
+flowchart LR
+    A["Reconocimiento<br/>80/tcp nginx 1.14.2"] --> B["Fuzzing<br/>gobuster"]
+    B --> C["/admin.php"]
+    C --> D["HO-0004-01<br/>admin:admin"]
+    D --> E["Panel admin<br/>flag visible"]
 ```
 
----
+### 3.2 Reconocimiento
 
-## Reconocimiento
-
-### Conectividad y sistema operativo
-
-Se comprobó que el host responde y se infirió el sistema operativo a partir del TTL.
+Verificación de conectividad:
 
 ```bash
 ping -c 1 10.129.58.34 | tee loot/ping.txt
 ```
 
-```text
-PING 10.129.58.34 (10.129.58.34) 56(84) bytes of data.
-64 bytes from 10.129.58.34: icmp_seq=1 ttl=63 time=238 ms
+El TTL de respuesta es 63; los sistemas Linux parten de 64 y el valor restante indica un
+salto intermedio (VPN), por lo que se infiere un sistema **Linux**.
 
---- 10.129.58.34 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 238.202/238.202/238.202/0.000 ms
-```
-
-> Evidencia: [`loot/ping.txt`](loot/ping.txt)
-
-| Dato     | Valor   | Interpretación                                                                                          |
-| -------- | ------- | --------------------------------------------------------------------------------------------------------- |
-| Latencia | ~238 ms | Host activo, alcanzable por la VPN.                                                                       |
-| TTL      | `63`    | Los sistemas Linux/Unix parten de TTL 64; el valor 63 indica un salto intermedio (VPN). Sistema **Linux**. |
-
-### Escaneo de puertos
-
-Primero se escanearon **todos los puertos TCP** de forma rápida para descubrir la superficie de ataque:
+Descubrimiento de puertos abiertos:
 
 ```bash
 nmap -p- --min-rate=5000 -T4 -Pn -n 10.129.58.34 -oN loot/puertos.txt
 ```
 
-```text
-Nmap scan report for 10.129.58.34
-Host is up (0.24s latency).
-Not shown: 65534 closed tcp ports (conn-refused)
-PORT   STATE SERVICE
-80/tcp open  http
-```
-
-> Evidencia: [`loot/puertos.txt`](loot/puertos.txt)
-
-| Opción            | Motivo                                                   |
-| ------------------ | ----------------------------------------------------------- |
-| `-p-`              | Todos los puertos (1-65535).                                |
-| `--min-rate=5000`  | Envía al menos 5000 paquetes/s para acelerar el escaneo.    |
-| `-T4`              | Plantilla de tiempos agresiva.                              |
-| `-Pn`              | Omite el descubrimiento de host (se asume activo).         |
-| `-n`               | Sin resolución DNS.                                         |
-| `-oN`              | Guarda la salida en formato normal.                          |
-
-**Resultado:** 65534 puertos cerrados y un único puerto abierto.
-
-| Puerto | Estado | Servicio |
-| ------ | ------ | -------- |
-| 80/tcp | open   | http     |
-
-Sobre el puerto descubierto se lanzó un escaneo de **detección de versiones y scripts por defecto**:
+Detección de servicios y versiones:
 
 ```bash
 nmap -p80 -sCV -Pn -n -T4 10.129.58.34 -oN loot/detallado.txt
 ```
 
-```text
-PORT   STATE SERVICE VERSION
-80/tcp open  http    nginx 1.14.2
-|_http-title: Welcome to nginx!
-|_http-server-header: nginx/1.14.2
-```
+| Puerto | Servicio | Versión | Observaciones |
+|--------|----------|---------|---------------|
+| 80/tcp | HTTP | nginx 1.14.2 | Único puerto abierto; muestra la página por defecto «Welcome to nginx!». |
 
-> Evidencia: [`loot/detallado.txt`](loot/detallado.txt)
+> Salida completa en el [Anexo A](#a-salida-completa-de-escaneos).
 
-| Opción | Motivo                                               |
-| ------ | ------------------------------------------------------ |
-| `-p80` | Limita el escaneo al puerto encontrado.                 |
-| `-sC`  | Ejecuta los scripts NSE por defecto.                    |
-| `-sV`  | Detecta la versión del servicio.                        |
+### 3.3 Enumeración
 
-**Resultado:**
-
-| Puerto | Estado | Servicio | Versión        |
-| ------ | ------ | -------- | --------------- |
-| 80/tcp | open   | http     | `nginx 1.14.2`  |
-
-La página por defecto (`Welcome to nginx!`) indica que la instalación de nginx no fue personalizada a nivel de página de inicio, pero no descarta contenido adicional alojado en otras rutas.
-
-## Enumeración
-
-### HTTP (80/tcp) — Fuzzing de directorios
-
-Dado que la raíz web no mostraba más que la página por defecto de nginx, se buscaron rutas y ficheros ocultos con `gobuster`, incluyendo la extensión `.php` por tratarse de una posible aplicación PHP:
+La raíz web solo muestra la página por defecto de nginx, lo que no descarta contenido en
+otras rutas. Se buscaron archivos y directorios ocultos con `gobuster`, incluyendo la
+extensión `.php` ante la posibilidad de una aplicación PHP:
 
 ```bash
 gobuster dir -u http://10.129.58.34 \
@@ -176,100 +181,215 @@ gobuster dir -u http://10.129.58.34 \
 admin.php            (Status: 200) [Size: 999]
 ```
 
-> Evidencia: [`loot/gobuster.txt`](loot/gobuster.txt)
+Se descubrió `/admin.php`, accesible (código 200) y no enlazado desde ninguna página
+visible. Al abrirlo en el navegador se encontró un formulario de inicio de sesión de
+administrador. El escaneo se interrumpió manualmente tras el hallazgo (0.27 % del
+diccionario), por lo que no se enumeró el resto de rutas.
 
-| Opción | Motivo                                                        |
-| ------ | --------------------------------------------------------------- |
-| `-u`   | URL objetivo.                                                   |
-| `-w`   | Wordlist de directorios/ficheros comunes (DirBuster medium).    |
-| `-x php` | Añade la extensión `.php` a cada palabra del diccionario.      |
-| `-t 200` | 200 hilos concurrentes para acelerar el escaneo.               |
+### 3.4 Acceso inicial
 
-**Resultado:** se descubrió `/admin.php`, devolviendo un código `200` (página accesible), no enlazado desde ningún sitio visible de la aplicación.
+Autenticación en el panel con `admin:admin`. Ver
+**[HO-0004-01](#ho-0004-01--panel-de-administración-con-credenciales-por-defecto)**.
 
-Al visitar `http://10.129.58.34/admin.php` en el navegador se encontró un formulario de **inicio de sesión de administrador**.
+### 3.5 Movimiento lateral
 
-## Explotación (Foothold)
+No aplica.
 
-- **Vulnerabilidad:** panel de administración protegido con **credenciales por defecto / triviales** (`admin:admin`).
-- **Referencia:** [CWE-521 – Weak Password Requirements](https://cwe.mitre.org/data/definitions/521.html) / [CWE-284 – Improper Access Control](https://cwe.mitre.org/data/definitions/284.html).
-- **Impacto:** acceso al panel de administración de la aplicación sin necesidad de explotar ningún fallo de software.
+### 3.6 Escalada de privilegios
 
-### Procedimiento
+No aplica: el objetivo de la máquina se cumple con el acceso al panel y no se obtuvo una
+shell en el sistema.
 
-1. Se navegó a `http://10.129.58.34/admin.php`.
-2. Se probaron credenciales triviales/por defecto en el formulario de login: usuario `admin`, contraseña `admin`.
-3. El login fue aceptado y el panel mostró la flag directamente en la página resultante.
+---
+
+## 4. Hallazgos técnicos
+
+### HO-0004-01 — Panel de administración con credenciales por defecto
+
+| | |
+|---|---|
+| **Severidad** | Crítica |
+| **CVSS v3.1** | 9.8 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H` |
+| **CWE** | [CWE-1392](https://cwe.mitre.org/data/definitions/1392.html) — Use of Default Credentials |
+| **CVE** | — |
+| **Componente afectado** | `http://10.129.58.34/admin.php` |
+| **Estado** | Explotada |
+
+#### Descripción
+
+El panel `/admin.php` está protegido por credenciales triviales (`admin` / `admin`). La
+causa raíz es que no se cambiaron las credenciales por defecto antes de publicar la
+aplicación y que se confió en que la ruta no estuviera enlazada como única barrera
+(*security by obscurity*). Tampoco se observó un segundo factor de autenticación.
+
+**Justificación del vector:** acceso por red, sin autenticación previa ni interacción. El
+puntaje asume control administrativo completo de la aplicación; las funciones del panel
+no se exploraron más allá de la lectura de la flag.
+
+#### Prueba de concepto
+
+**Paso 1.** Descubrir el panel mediante fuzzing de rutas (ver sección 3.3).
+
+**Paso 2.** Abrir `http://10.129.58.34/admin.php` e ingresar las credenciales:
 
 ```text
 Usuario:    admin
 Contraseña: admin
 ```
 
-No fue necesario inyectar código ni explotar una vulnerabilidad de la aplicación: el propio desarrollador dejó credenciales de administrador triviales en producción.
+**Paso 3.** El acceso es aceptado y el panel muestra la flag directamente en la página.
 
-## Escalada de privilegios
+#### Impacto
 
-No fue necesaria. El objetivo de la máquina (obtener la flag) se cumple con el acceso al panel `admin.php` mediante credenciales por defecto, sin llegar a obtener una shell en el sistema. Por ello no hay vector de escalada que documentar.
+- **Confidencialidad:** acceso a la información que gestiona el panel.
+- **Integridad:** posibilidad de modificar contenido o configuración de la aplicación
+  (no verificada).
+- **Disponibilidad:** posibilidad de alterar el funcionamiento de la aplicación
+  (no verificada).
+
+#### Remediación
+
+- **Corto plazo:** cambiar las credenciales por defecto y exigir una contraseña robusta
+  con política de bloqueo tras intentos fallidos.
+- **Largo plazo:** restringir el panel por VPN, firewall o lista de IP, añadir
+  autenticación multifactor y proteger cada endpoint con autenticación real en lugar de
+  depender de rutas no enlazadas.
+
+#### Referencias
+
+- [CWE-1392 — Use of Default Credentials](https://cwe.mitre.org/data/definitions/1392.html)
+- [CWE-521 — Weak Password Requirements](https://cwe.mitre.org/data/definitions/521.html)
+- [OWASP WSTG — Testing for Default Credentials](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/02-Testing_for_Default_Credentials)
 
 ---
 
-## Flags
+## 5. Post-explotación
 
-| Flag     | Valor                              |
-| -------- | ----------------------------------- |
-| `flag`   | `6483bee07c1c1d57f14e5b0717503c73` |
+### 5.1 Acceso obtenido
 
-> Preignition pertenece a Starting Point: solo existe una flag, obtenida directamente desde el panel `admin.php` (no hay `user.txt` / `root.txt`). Evidencia: [`loot/flag.txt`](loot/flag.txt).
+| Nivel | Usuario | Método | Prueba |
+|-------|---------|--------|--------|
+| Administrador de aplicación | `admin` | HO-0004-01 | `flag` — `6483bee0************************` |
 
-## Vulnerabilidades identificadas
+> Preignition pertenece a Starting Point: solo existe una flag y no hay `user.txt` / `root.txt`.
 
-| # | Vulnerabilidad                                   | Severidad | CVSS | Componente         | Mitigación                                                           |
-| - | -------------------------------------------------- | --------- | ---- | -------------------- | ------------------------------------------------------------------------ |
-| 1 | Credenciales de administrador por defecto/triviales | Crítica   | N/A  | Panel `admin.php`    | Forzar el cambio de credenciales por defecto y usar contraseñas robustas. |
-| 2 | Panel de administración sin control de acceso adicional | Alta  | N/A  | Panel `admin.php`    | Restringir el acceso por IP/VPN y añadir autenticación multifactor.       |
-| 3 | Exposición de rutas sensibles no enlazadas (security by obscurity) | Media | N/A | Servidor web (80/tcp) | No depender de la ocultación de rutas; proteger cada endpoint por autenticación real. |
+### 5.2 Información sensible expuesta
 
-> Severidad: Crítica / Alta / Media / Baja / Informativa. Los valores CVSS no se calcularon para los hallazgos de configuración.
+| Tipo | Ubicación | Observación |
+|------|-----------|-------------|
+| Credenciales por defecto | `/admin.php` | `admin:admin` (valor por defecto). |
+| Flag | Panel de administración | Visible tras autenticarse. |
 
-## Recomendaciones de mitigación
+> Las credenciales y flags se muestran parcialmente censuradas cuando corresponde.
 
-- [ ] Eliminar o cambiar inmediatamente cualquier credencial por defecto (`admin:admin`) antes de pasar a producción.
-- [ ] Exigir contraseñas robustas y políticas de bloqueo tras varios intentos fallidos de login.
-- [ ] Restringir el acceso a paneles de administración mediante firewall, VPN o listas de IP permitidas.
-- [ ] No confiar en que una ruta no esté enlazada para considerarla protegida (security by obscurity).
-- [ ] Añadir autenticación multifactor en paneles administrativos.
-- [ ] Mantener el software del servidor (nginx) y la aplicación actualizados.
+### 5.3 Limpieza
 
-## Lecciones aprendidas
+| Artefacto | Ubicación | Estado |
+|-----------|-----------|--------|
+| — | — | No se cargaron archivos ni herramientas en el objetivo. |
 
-- Cuando la raíz web no aporta información, un fuzzing de directorios/ficheros (`gobuster`, `feroxbuster`, `ffuf`) con diccionarios comunes suele revelar paneles ocultos.
-- Probar siempre credenciales triviales o por defecto (`admin:admin`, `admin:password`, etc.) en cualquier formulario de login antes de buscar vulnerabilidades más complejas.
-- El TTL de un `ping` da una pista rápida del sistema operativo (64 ≈ Linux, 128 ≈ Windows).
-- Escanear primero todos los puertos y luego profundizar solo en los abiertos ahorra tiempo.
+---
 
-## Herramientas utilizadas
+## 6. Conclusiones
 
-| Herramienta | Uso                                           |
-| ----------- | ---------------------------------------------- |
-| ping        | Test de conectividad y estimación del SO       |
-| nmap        | Escaneo de puertos, versiones y scripts        |
-| gobuster    | Fuzzing de directorios y ficheros web          |
-| navegador   | Acceso al panel `admin.php` y login            |
+### 6.1 Conclusión técnica
 
-## Evidencia
+La exposición se debió a una falla de gestión de credenciales: un panel administrativo
+publicado con usuario y contraseña por defecto, protegido solo por no estar enlazado. Un
+simple fuzzing de rutas bastó para descubrirlo y una credencial trivial para entrar; no se
+explotó ninguna vulnerabilidad de software.
 
-Todos los artefactos están en la carpeta [`loot/`](loot/):
+### 6.2 Aprendizajes del auditor
 
-| Fichero                                | Contenido                                                      |
-| --------------------------------------- | ----------------------------------------------------------------- |
-| [`ping.txt`](loot/ping.txt)            | Test de conectividad (TTL 63).                                    |
-| [`puertos.txt`](loot/puertos.txt)      | Escaneo completo de puertos (solo 80/tcp abierto).                |
-| [`detallado.txt`](loot/detallado.txt)  | Detección de versión (nginx 1.14.2).                               |
-| [`gobuster.txt`](loot/gobuster.txt)    | Fuzzing de directorios: descubrimiento de `admin.php`.            |
-| [`flag.txt`](loot/flag.txt)            | Flag obtenida desde el panel `admin.php` tras el login.           |
+- Cuando la raíz web no aporta información, el fuzzing de rutas y extensiones suele
+  revelar paneles ocultos.
+- Probar credenciales triviales (`admin:admin`, `admin:password`) antes de buscar
+  vulnerabilidades complejas.
+- Dejar correr `gobuster` completo habría enumerado más superficie; aquí se detuvo al
+  encontrar el objetivo.
 
-## Referencias
+---
+
+## 7. Anexos
+
+### A. Salida completa de escaneos
+
+<details>
+<summary>nmap — todos los puertos</summary>
+
+```text
+# Nmap 7.991 scan initiated Sat Oct 17 14:32:08 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN puertos.txt 10.129.58.34
+Nmap scan report for 10.129.58.34
+Host is up (0.24s latency).
+Not shown: 65534 closed tcp ports (conn-refused)
+PORT   STATE SERVICE
+80/tcp open  http
+
+# Nmap done at Sat Oct 17 14:32:26 2026 -- 1 IP address (1 host up) scanned in 18.31 seconds
+```
+
+</details>
+
+<details>
+<summary>nmap — escaneo de servicios</summary>
+
+```text
+# Nmap 7.991 scan initiated Sat Oct 17 14:32:44 2026 as: nmap -p80 -sCV -Pn -n -T4 -oN detallado.txt 10.129.58.34
+Nmap scan report for 10.129.58.34
+Host is up (0.24s latency).
+
+PORT   STATE SERVICE VERSION
+80/tcp open  http    nginx 1.14.2
+|_http-title: Welcome to nginx!
+|_http-server-header: nginx/1.14.2
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 17 14:32:56 2026 -- 1 IP address (1 host up) scanned in 12.32 seconds
+```
+
+</details>
+
+<details>
+<summary>gobuster — enumeración de rutas</summary>
+
+```text
+gobuster dir -u http://10.129.58.34 -w /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt -x php -t 200
+===============================================================
+Gobuster v3.8.2
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.129.58.34
+[+] Method:                  GET
+[+] Threads:                 200
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.8.2
+[+] Extensions:              php
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+admin.php            (Status: 200) [Size: 999]
+Progress: 1192 / 441116 (0.27%)
+```
+
+</details>
+
+### B. Scripts y exploits
+
+No se utilizaron scripts ni exploits.
+
+### C. Mapeo MITRE ATT&CK
+
+| Táctica | Técnica | ID |
+|---------|---------|----|
+| Discovery | Content and Directory Discovery | [T1083](https://attack.mitre.org/techniques/T1083/) |
+| Initial Access | Valid Accounts: Default Accounts | [T1078.001](https://attack.mitre.org/techniques/T1078/001/) |
+
+### D. Referencias generales
 
 - [Página de la máquina en HTB](https://app.hackthebox.com/machines/Preignition)
-- [CWE-521 – Weak Password Requirements](https://cwe.mitre.org/data/definitions/521.html)
+- [PTES — Penetration Testing Execution Standard](http://www.pentest-standard.org/)
+- [OWASP Web Security Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
+- [Calculadora CVSS v3.1 — FIRST](https://www.first.org/cvss/calculator/3.1)
+- [MITRE ATT&CK](https://attack.mitre.org/)
