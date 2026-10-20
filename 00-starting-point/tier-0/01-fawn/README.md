@@ -1,143 +1,427 @@
 ---
-title: Fawn
+report_id: HO-0002-00
+target: Fawn
+platform: Hack The Box
 os: Linux
-dificultad: Very Easy
+difficulty: Very Easy
 ip: 10.129.1.14
-fecha: 2026-10-17
-categoria: Starting Point
-estado: completada
-tags: [htb, linux, ftp, anonymous-login]
+date: 2026-10-17
+version: 1.0
+author: Francisco Nieto
+status: Final
+tags: [htb, linux, very-easy, starting-point, ftp, anonymous-login]
 ---
 
-# Fawn — Informe de Pentest
+# Informe de Prueba de Penetración — Fawn
 
-> Writeup de la máquina **Fawn** de [Hack The Box](https://www.hackthebox.com/). Documento con fines educativos, realizado en un entorno de laboratorio autorizado.
+| | |
+|---|---|
+| **ID de informe** | HO-0002-00 |
+| **Objetivo** | Fawn (`10.129.1.14`) |
+| **Plataforma** | Hack The Box — Starting Point (Tier 0) |
+| **Tipo de prueba** | Caja negra (black box) |
+| **Fecha de ejecución** | 2026-10-17 |
+| **Autor** | Francisco Nieto — [@NiettoFrann](https://github.com/NiettoFrann) |
+| **Versión** | 1.0 |
+| **Clasificación** | Público — uso educativo |
 
-## Información general
+> **Aviso legal.** Las pruebas se realizaron sobre un entorno de laboratorio autorizado
+> (Hack The Box). Ninguna técnica descrita debe aplicarse sobre sistemas sin autorización
+> expresa por escrito de su propietario.
 
-| Campo                   | Detalle        |
-| ----------------------- | -------------- |
-| **Máquina**             | Fawn           |
-| **Sistema operativo**   | Linux          |
-| **Dificultad**          | Very Easy      |
-| **Categoría**           | Starting Point |
-| **Dirección IP**        | `10.129.1.14`  |
-| **Fecha de resolución** | 2026-10-17     |
-| **Autor del informe**   | NiettoFrann    |
-| **Estado**              | Completada     |
+### Control de versiones
+
+| Versión | Fecha | Descripción |
+|---------|-------|-------------|
+| 1.0 | 2026-10-17 | Versión inicial |
+
+---
 
 ## Índice
 
-1. [Resumen ejecutivo](#resumen-ejecutivo)
-2. [Alcance y metodología](#alcance-y-metodología)
-3. [Cadena de ataque](#cadena-de-ataque)
-4. [Reconocimiento](#reconocimiento)
-5. [Enumeración](#enumeración)
-6. [Explotación (Foothold)](#explotación-foothold)
-7. [Escalada de privilegios](#escalada-de-privilegios)
-8. [Flags](#flags)
-9. [Vulnerabilidades identificadas](#vulnerabilidades-identificadas)
-10. [Recomendaciones de mitigación](#recomendaciones-de-mitigación)
-11. [Lecciones aprendidas](#lecciones-aprendidas)
-12. [Herramientas utilizadas](#herramientas-utilizadas)
-13. [Evidencia](#evidencia)
-14. [Referencias](#referencias)
+1. [Resumen ejecutivo](#1-resumen-ejecutivo)
+2. [Alcance y metodología](#2-alcance-y-metodología)
+3. [Narrativa del ataque](#3-narrativa-del-ataque)
+4. [Hallazgos técnicos](#4-hallazgos-técnicos)
+5. [Post-explotación](#5-post-explotación)
+6. [Conclusiones](#6-conclusiones)
+7. [Anexos](#7-anexos)
 
 ---
 
-## Resumen ejecutivo
+## 1. Resumen ejecutivo
 
-La máquina `Fawn` se comprometió a través de un servicio **FTP mal configurado que permite el acceso anónimo**.
+### 1.1 Objetivo
 
-- El único puerto abierto es el **21/tcp (FTP)**, con `vsftpd 3.0.3`.
-- El servidor acepta el login `anonymous` sin contraseña y expone un fichero `flag.txt` legible por cualquiera.
-- No fue necesario explotar ninguna vulnerabilidad de software: bastó con autenticarse como `anonymous` y descargar el fichero.
-- La versión `vsftpd 3.0.3` tiene un CVE conocido ([CVE-2021-30047](https://www.cve.org/CVERecord?id=CVE-2021-30047)), pero solo permite una denegación de servicio (DoS), por lo que no aporta a la intrusión y no se utilizó.
+Evaluar la seguridad del host **Fawn** simulando un atacante externo sin credenciales ni
+conocimiento previo del entorno, con el fin de obtener el máximo nivel de acceso posible.
 
-**Impacto:** cualquier persona con conectividad de red al puerto 21 puede leer (y potencialmente escribir, según la configuración) ficheros del servidor sin autenticación.
+### 1.2 Resultado
 
-## Alcance y metodología
+> El servidor ofrece un servicio de transferencia de archivos que permite entrar sin
+> usuario ni contraseña. Cualquier persona con acceso a la red puede ver y descargar los
+> archivos que allí se almacenan; en este caso, un archivo con información reservada. Un
+> atacante real podría robar información que el propietario no pretendía publicar y,
+> según la configuración, eventualmente subir archivos propios.
 
-- **Objetivo:** `10.129.1.14` (Fawn)
-- **Tipo de prueba:** caja negra, sin credenciales previas.
-- **Metodología:** Reconocimiento → Enumeración → Explotación → Post-explotación / Escalada de privilegios → Documentación.
-- **Entorno:** conexión a la VPN de HTB desde Linux.
+**Nivel de riesgo global:** `ALTO`
 
-## Cadena de ataque
+### 1.3 Distribución de hallazgos
 
-```text
-Ping (TTL 63 → Linux) -> Escaneo de 65535 puertos (solo 21/tcp) -> Escaneo detallado (vsftpd 3.0.3, ftp-anon habilitado)
-  -> Login FTP como anonymous -> Descarga de flag.txt
+| Crítica | Alta | Media | Baja | Informativa |
+|:-------:|:----:|:-----:|:----:|:-----------:|
+| 0 | 2 | 1 | 0 | 0 |
+
+### 1.4 Resumen de hallazgos
+
+| ID | Hallazgo | Severidad | CVSS |
+|----|----------|-----------|------|
+| [HO-0002-01](#ho-0002-01--acceso-ftp-anónimo-habilitado) | Acceso FTP anónimo habilitado | Alta | 7.5 |
+| [HO-0002-02](#ho-0002-02--versión-de-vsftpd-afectada-por-cve-2021-30047) | Versión de vsftpd afectada por CVE-2021-30047 | Alta | 7.5 |
+| [HO-0002-03](#ho-0002-03--tráfico-ftp-sin-cifrar) | Tráfico FTP sin cifrar | Media | 5.9 |
+
+### 1.5 Recomendaciones prioritarias
+
+1. Deshabilitar el acceso anónimo (`anonymous_enable=NO`) salvo necesidad justificada.
+2. Sustituir FTP por SFTP o FTPS y actualizar `vsftpd`.
+3. Restringir el puerto 21 por firewall y no almacenar información sensible en el FTP.
+
+---
+
+## 2. Alcance y metodología
+
+### 2.1 Alcance
+
+| Activo | Dirección | Incluido |
+|--------|-----------|:--------:|
+| Fawn | `10.129.1.14` | Sí |
+
+**Fuera de alcance:** ataques de denegación de servicio, infraestructura de la
+plataforma y otros jugadores.
+
+### 2.2 Metodología
+
+La prueba siguió las fases del estándar **PTES** (Penetration Testing Execution
+Standard):
+
+1. **Reconocimiento** — descubrimiento de puertos y servicios.
+2. **Enumeración** — identificación de versiones y superficie de ataque.
+3. **Análisis de vulnerabilidades** — validación manual de posibles fallos.
+4. **Explotación** — obtención de acceso inicial.
+5. **Post-explotación** — recolección de evidencia.
+6. **Reporte** — documentación de hallazgos y recomendaciones.
+
+### 2.3 Entorno del auditor
+
+| Componente | Detalle |
+|------------|---------|
+| Sistema | Linux (kernel 7.2.11-zen1-1-zen) |
+| Conexión | VPN de Hack The Box |
+| Herramientas | ping, nmap 7.991, ftp |
+
+### 2.4 Clasificación de severidad
+
+Las vulnerabilidades se puntúan con **CVSS v3.1** (ver tabla de criterios estándar).
+
+---
+
+## 3. Narrativa del ataque
+
+### 3.1 Cadena de compromiso
+
+```mermaid
+flowchart LR
+    A["Reconocimiento<br/>21/tcp"] --> B["HO-0002-01<br/>Login anonymous"]
+    B --> C["Listado FTP"]
+    C --> D["Descarga de<br/>flag.txt"]
 ```
 
----
+### 3.2 Reconocimiento
 
-## Reconocimiento
-
-### Conectividad y sistema operativo
-
-Se comprobó que el host responde y se infirió el sistema operativo a partir del TTL.
+Verificación de conectividad:
 
 ```bash
 ping -c 1 10.129.1.14 | tee loot/ping.txt
 ```
 
-```text
-PING 10.129.1.14 (10.129.1.14) 56(84) bytes of data.
-64 bytes from 10.129.1.14: icmp_seq=1 ttl=63 time=232 ms
+El TTL de respuesta es 63; los sistemas Linux parten de 64 y el valor restante indica un
+salto intermedio (VPN), por lo que se infiere un sistema **Linux**.
 
---- 10.129.1.14 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 232.082/232.082/232.082/0.000 ms
-```
-
-> Evidencia: [`loot/ping.txt`](loot/ping.txt)
-
-| Dato    | Valor    | Interpretación                                                                                                   |
-| ------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
-| Latencia | ~232 ms  | Host activo, alcanzable por la VPN.                                                                              |
-| TTL     | `63`     | Los sistemas Linux/Unix parten de TTL 64; el valor 63 indica un salto intermedio (VPN). Sistema **Linux**.       |
-
-### Escaneo de puertos
-
-Primero se escanearon **todos los puertos TCP** de forma rápida para descubrir la superficie de ataque:
+Descubrimiento de puertos abiertos:
 
 ```bash
 nmap -p- --min-rate=5000 -T4 -Pn -n 10.129.1.14 -oN loot/puertos.txt
 ```
 
-```text
-Nmap scan report for 10.129.1.14
-Host is up (0.23s latency).
-Not shown: 65534 closed tcp ports (conn-refused)
-PORT   STATE SERVICE
-21/tcp open  ftp
-```
-
-> Evidencia: [`loot/puertos.txt`](loot/puertos.txt)
-
-| Opción           | Motivo                                                              |
-| ---------------- | ------------------------------------------------------------------- |
-| `-p-`            | Todos los puertos (1-65535).                                        |
-| `--min-rate=5000`| Envía al menos 5000 paquetes/s para acelerar el escaneo.            |
-| `-T4`            | Plantilla de tiempos agresiva.                                      |
-| `-Pn`            | Omite el descubrimiento de host (se asume activo).                  |
-| `-n`             | Sin resolución DNS.                                                 |
-| `-oN`            | Guarda la salida en formato normal.                                 |
-
-**Resultado:** 65534 puertos cerrados y un único puerto abierto.
-
-| Puerto | Estado | Servicio |
-| ------ | ------ | -------- |
-| 21/tcp | open   | ftp      |
-
-Sobre el puerto descubierto se lanzó un escaneo de **detección de versiones y scripts por defecto**:
+Detección de servicios y versiones:
 
 ```bash
 nmap -p21 -sCV -Pn -n -T4 10.129.1.14 -oN loot/detallado.txt
 ```
 
+| Puerto | Servicio | Versión | Observaciones |
+|--------|----------|---------|---------------|
+| 21/tcp | FTP | vsftpd 3.0.3 | Login anónimo permitido; control y datos en texto plano. |
+
+> Salida completa en el [Anexo A](#a-salida-completa-de-escaneos).
+
+### 3.3 Enumeración
+
+La salida de `nmap` (script `ftp-anon`) indica que el login anónimo está permitido (código
+FTP 230) y lista un archivo en la raíz: `flag.txt`, propiedad de root, legible por todos
+y de 32 bytes. También informa que las conexiones de control y de datos no están
+cifradas.
+
+Se verificó el acceso de forma manual:
+
+```bash
+ftp 10.129.1.14
+# Name: anonymous
+# Password: (vacía)
+ftp> ls
+```
+
+Sobre la versión `vsftpd 3.0.3` se identificó el **CVE-2021-30047**, que permite una
+denegación de servicio por agotamiento de recursos. No otorga acceso ni ejecución de
+código, por lo que se descartó para la intrusión y no se probó. La puerta trasera de
+`vsftpd 2.3.4` no aplica a esta versión.
+
+### 3.4 Acceso inicial
+
+Autenticación como `anonymous` y descarga de `flag.txt`. Ver
+**[HO-0002-01](#ho-0002-01--acceso-ftp-anónimo-habilitado)**.
+
+### 3.5 Movimiento lateral
+
+No aplica.
+
+### 3.6 Escalada de privilegios
+
+No aplica: el objetivo de la máquina se cumple con el acceso anónimo inicial y no se
+obtuvo una shell en el sistema.
+
+---
+
+## 4. Hallazgos técnicos
+
+### HO-0002-01 — Acceso FTP anónimo habilitado
+
+| | |
+|---|---|
+| **Severidad** | Alta |
+| **CVSS v3.1** | 7.5 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N` |
+| **CWE** | [CWE-284](https://cwe.mitre.org/data/definitions/284.html) — Improper Access Control |
+| **CVE** | — |
+| **Componente afectado** | `ftp://10.129.1.14:21` — vsftpd 3.0.3 |
+| **Estado** | Explotada |
+
+#### Descripción
+
+El servidor vsftpd acepta el usuario `anonymous` sin contraseña y expone archivos de la
+raíz a cualquier visitante. La causa raíz es una configuración insegura (acceso anónimo
+habilitado), no un fallo de software.
+
+**Justificación del vector:** acceso por red, sin autenticación ni interacción y con
+pérdida total de confidencialidad sobre los archivos expuestos. No se probó la escritura,
+por lo que la integridad se considera sin impacto.
+
+#### Prueba de concepto
+
+**Paso 1.** Conexión y autenticación anónima.
+
+```bash
+ftp 10.129.1.14
+# Name: anonymous
+```
+
+**Paso 2.** Listado y descarga del archivo.
+
+```bash
+ftp> ls
+ftp> get flag.txt
+ftp> bye
+```
+
+**Paso 3.** Lectura local de la flag.
+
+```bash
+cat flag.txt
+```
+
+#### Impacto
+
+- **Confidencialidad:** lectura de cualquier archivo ubicado en el área anónima.
+- **Integridad / disponibilidad:** no verificadas; dependen de si el servidor permite
+  escritura anónima.
+
+#### Remediación
+
+- **Corto plazo:** establecer `anonymous_enable=NO` en `vsftpd.conf`.
+- **Largo plazo:** si el FTP debe ser público, limitarlo a solo lectura sobre un
+  directorio sin información sensible y restringir el puerto 21 por firewall.
+
+#### Referencias
+
+- [CWE-284 — Improper Access Control](https://cwe.mitre.org/data/definitions/284.html)
+- [CWE-287 — Improper Authentication](https://cwe.mitre.org/data/definitions/287.html)
+- [vsftpd — sitio oficial](https://security.appspot.com/vsftpd.html)
+
+---
+
+### HO-0002-02 — Versión de vsftpd afectada por CVE-2021-30047
+
+| | |
+|---|---|
+| **Severidad** | Alta |
+| **CVSS v3.1** | 7.5 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` |
+| **CWE** | [CWE-400](https://cwe.mitre.org/data/definitions/400.html) — Uncontrolled Resource Consumption |
+| **CVE** | [CVE-2021-30047](https://www.cve.org/CVERecord?id=CVE-2021-30047) |
+| **Componente afectado** | `vsftpd 3.0.3` — `10.129.1.14:21` |
+| **Estado** | Identificada, no explotada |
+
+#### Descripción
+
+La versión `vsftpd 3.0.3`, detectada por `nmap`, está afectada por una denegación de
+servicio por agotamiento de recursos. La causa raíz es el uso de un software sin
+actualizar. Esta debilidad no fue probada para no afectar la disponibilidad del
+laboratorio y no contribuye a la intrusión.
+
+#### Prueba de concepto
+
+No se ejecutó. La versión se obtuvo de la detección de servicios:
+
+```bash
+nmap -p21 -sCV -Pn -n -T4 10.129.1.14 -oN loot/detallado.txt
+```
+
+#### Impacto
+
+- **Disponibilidad:** un atacante remoto sin autenticación podría dejar el servicio FTP
+  fuera de línea.
+
+#### Remediación
+
+- **Corto plazo:** actualizar `vsftpd` a una versión corregida.
+- **Largo plazo:** mantener un proceso de gestión de parches para los servicios expuestos.
+
+#### Referencias
+
+- [CVE-2021-30047](https://www.cve.org/CVERecord?id=CVE-2021-30047)
+
+---
+
+### HO-0002-03 — Tráfico FTP sin cifrar
+
+| | |
+|---|---|
+| **Severidad** | Media |
+| **CVSS v3.1** | 5.9 — `CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N` |
+| **CWE** | [CWE-319](https://cwe.mitre.org/data/definitions/319.html) — Cleartext Transmission of Sensitive Information |
+| **CVE** | — |
+| **Componente afectado** | `ftp://10.129.1.14:21` — vsftpd 3.0.3 |
+| **Estado** | Identificada |
+
+#### Descripción
+
+La salida de `ftp-syst` confirma `Control connection is plain text` y
+`Data connections will be plain text`: el servicio no ofrece TLS, de modo que
+credenciales y datos viajan sin cifrar.
+
+**Justificación del vector:** requiere posición de intermediario en la red
+(`AC:H`), de ahí la complejidad alta.
+
+#### Prueba de concepto
+
+Observado en la salida de `nmap -sCV` (ver [Anexo A](#a-salida-completa-de-escaneos)).
+
+#### Impacto
+
+- **Confidencialidad:** un atacante con visibilidad del tráfico podría capturar
+  credenciales y contenido transferido.
+
+#### Remediación
+
+- **Corto plazo:** habilitar FTPS (TLS) en vsftpd.
+- **Largo plazo:** reemplazar FTP por SFTP.
+
+#### Referencias
+
+- [CWE-319](https://cwe.mitre.org/data/definitions/319.html)
+
+---
+
+## 5. Post-explotación
+
+### 5.1 Acceso obtenido
+
+| Nivel | Usuario | Método | Prueba |
+|-------|---------|--------|--------|
+| Lectura FTP | `anonymous` | HO-0002-01 | `flag.txt` — `035db21c************************` |
+
+> Fawn pertenece a Starting Point: solo existe una flag y no hay `user.txt` / `root.txt`.
+
+### 5.2 Información sensible expuesta
+
+| Tipo | Ubicación | Observación |
+|------|-----------|-------------|
+| Archivo reservado | FTP anónimo — `/flag.txt` | Legible por cualquier visitante. |
+
+> Las flags se muestran parcialmente censuradas.
+
+### 5.3 Limpieza
+
+| Artefacto | Ubicación | Estado |
+|-----------|-----------|--------|
+| `flag.txt` descargada | Equipo del auditor — `loot/flag.txt` | Conservada como evidencia. |
+
+---
+
+## 6. Conclusiones
+
+### 6.1 Conclusión técnica
+
+La postura de seguridad falló por una configuración permisiva: el servicio FTP acepta
+sesiones anónimas y expone un archivo reservado. No hizo falta explotar ninguna
+vulnerabilidad de software; el CVE existente solo permite denegación de servicio y no
+aportaba a la intrusión.
+
+### 6.2 Aprendizajes del auditor
+
+- Probar siempre el login `anonymous` ante un FTP expuesto; `nmap -sC` lo detecta con
+  `ftp-anon`.
+- Una configuración insegura puede ser más grave que una versión vulnerable.
+- Escanear primero todos los puertos y profundizar solo en los abiertos ahorra tiempo.
+
+---
+
+## 7. Anexos
+
+### A. Salida completa de escaneos
+
+<details>
+<summary>nmap — todos los puertos</summary>
+
 ```text
+# Nmap 7.991 scan initiated Sat Oct 17 12:07:08 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN puertos.txt 10.129.1.14
+Nmap scan report for 10.129.1.14
+Host is up (0.23s latency).
+Not shown: 65534 closed tcp ports (conn-refused)
+PORT   STATE SERVICE
+21/tcp open  ftp
+
+# Nmap done at Sat Oct 17 12:07:26 2026 -- 1 IP address (1 host up) scanned in 17.72 seconds
+```
+
+</details>
+
+<details>
+<summary>nmap — escaneo de servicios</summary>
+
+```text
+# Nmap 7.991 scan initiated Sat Oct 17 12:07:50 2026 as: nmap -p21 -sCV -Pn -n -T4 -oN detallado.txt 10.129.1.14
+Nmap scan report for 10.129.1.14
+Host is up (0.24s latency).
+
 PORT   STATE SERVICE VERSION
 21/tcp open  ftp     vsftpd 3.0.3
 | ftp-anon: Anonymous FTP login allowed (FTP code 230)
@@ -156,137 +440,27 @@ PORT   STATE SERVICE VERSION
 |      vsFTPd 3.0.3 - secure, fast, stable
 |_End of status
 Service Info: OS: Unix
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 17 12:07:57 2026 -- 1 IP address (1 host up) scanned in 6.24 seconds
 ```
 
-> Evidencia: [`loot/detallado.txt`](loot/detallado.txt)
+</details>
 
-| Opción | Motivo                                              |
-| ------ | --------------------------------------------------- |
-| `-p21` | Limita el escaneo al puerto encontrado.             |
-| `-sC`  | Ejecuta los scripts NSE por defecto (ej. `ftp-anon`).|
-| `-sV`  | Detecta la versión del servicio.                    |
+### B. Scripts y exploits
 
-**Resultado:**
+No se utilizaron scripts ni exploits.
 
-| Puerto | Estado | Servicio | Versión         |
-| ------ | ------ | -------- | --------------- |
-| 21/tcp | open   | ftp      | `vsftpd 3.0.3`  |
+### C. Mapeo MITRE ATT&CK
 
-Hallazgos relevantes de la salida de nmap:
+| Táctica | Técnica | ID |
+|---------|---------|----|
+| Initial Access | Valid Accounts: Default Accounts | [T1078.001](https://attack.mitre.org/techniques/T1078/001/) |
+| Collection | Data from Information Repositories | [T1213](https://attack.mitre.org/techniques/T1213/) |
 
-- `ftp-anon: Anonymous FTP login allowed (FTP code 230)` → **el login anónimo está permitido**.
-- El script ya lista un fichero en la raíz del FTP: `-rw-r--r-- 1 0 0 32 Jun 04 2021 flag.txt` (propiedad de root, legible por todos, 32 bytes).
-- `Control connection is plain text` / `Data connections will be plain text` → el tráfico no está cifrado (sin TLS).
-
-## Enumeración
-
-### FTP (21/tcp)
-
-Con la información del escaneo, se verificó manualmente el acceso anónimo. El usuario es `anonymous` y la contraseña puede quedar vacía.
-
-```bash
-ftp 10.129.1.14
-# Name: anonymous
-# Password: (vacía / Enter)
-ftp> ls
-```
-
-Se confirmó el listado visto por nmap: un único fichero, `flag.txt`.
-
-### Búsqueda de vulnerabilidades
-
-Se revisó la versión `vsftpd 3.0.3`:
-
-- **CVE-2021-30047**: DoS por agotamiento de recursos. No permite acceso ni ejecución de código, por lo que se descartó para este objetivo.
-- La conocida puerta trasera de `vsftpd 2.3.4` **no aplica** a esta versión.
-
-## Explotación (Foothold)
-
-- **Vulnerabilidad:** acceso anónimo habilitado en el servicio FTP (configuración insegura, no un fallo de software).
-- **Referencia:** [CWE-287 – Improper Authentication](https://cwe.mitre.org/data/definitions/287.html) / [CWE-284 – Improper Access Control](https://cwe.mitre.org/data/definitions/284.html).
-- **Impacto:** lectura de ficheros del servidor sin autenticar.
-
-### Procedimiento
-
-```bash
-ftp 10.129.1.14
-# Name: anonymous
-ftp> ls
-ftp> get flag.txt
-ftp> bye
-
-cat flag.txt
-```
-
-`get flag.txt` descarga el fichero a la máquina atacante y `cat` muestra su contenido:
-
-```text
-035db21c881520061c53e0536e44f815
-```
-
-> Evidencia: [`loot/flag.txt`](loot/flag.txt)
-
-## Escalada de privilegios
-
-No fue necesaria. El objetivo de la máquina (obtener la flag) se cumple con el acceso anónimo inicial, sin obtener una shell en el sistema. Por ello no hay vector de escalada que documentar.
-
----
-
-## Flags
-
-| Flag       | Valor                              |
-| ---------- | ---------------------------------- |
-| `flag.txt` | `035db21c881520061c53e0536e44f815` |
-
-> Fawn pertenece a Starting Point: solo existe una flag, obtenida directamente por FTP (no hay `user.txt` / `root.txt`). Evidencia: [`loot/flag.txt`](loot/flag.txt).
-
-## Vulnerabilidades identificadas
-
-| # | Vulnerabilidad                         | Severidad | CVSS | Componente         | Mitigación                                                    |
-| - | -------------------------------------- | --------- | ---- | ------------------ | ------------------------------------------------------------- |
-| 1 | Acceso FTP anónimo habilitado          | Alta      | N/A  | vsftpd (21/tcp)    | Deshabilitar `anonymous_enable` en `vsftpd.conf`.             |
-| 2 | Tráfico FTP sin cifrar                 | Media     | N/A  | vsftpd (21/tcp)    | Usar FTPS/SFTP.                                               |
-| 3 | vsftpd 3.0.3 vulnerable a DoS (CVE-2021-30047) | Baja | N/A | vsftpd 3.0.3 | Actualizar a una versión corregida.                           |
-
-> Severidad: Crítica / Alta / Media / Baja / Informativa. Los valores CVSS no se calcularon para los hallazgos de configuración.
-
-## Recomendaciones de mitigación
-
-- [ ] Deshabilitar el acceso anónimo (`anonymous_enable=NO`) salvo necesidad justificada.
-- [ ] Si el FTP debe ser público, limitarlo a solo lectura y a un directorio sin información sensible.
-- [ ] Sustituir FTP por SFTP o FTPS para cifrar las credenciales y los datos.
-- [ ] Mantener el software y los servicios actualizados.
-- [ ] Restringir el acceso al puerto 21 mediante firewall a las IP necesarias.
-- [ ] No dejar ficheros sensibles ni credenciales en directorios accesibles.
-
-## Lecciones aprendidas
-
-- Probar siempre el login `anonymous` cuando hay un FTP expuesto; nmap con `-sC` lo detecta automáticamente (`ftp-anon`).
-- Una configuración insegura puede ser más grave que una versión vulnerable: aquí el CVE existente no servía y el fallo real era de configuración.
-- El TTL de un `ping` da una pista rápida del sistema operativo (64 ≈ Linux, 128 ≈ Windows).
-- Escanear primero todos los puertos y luego profundizar solo en los abiertos ahorra tiempo.
-
-## Herramientas utilizadas
-
-| Herramienta | Uso                                      |
-| ----------- | ---------------------------------------- |
-| ping        | Test de conectividad y estimación del SO |
-| nmap        | Escaneo de puertos, versiones y scripts  |
-| ftp         | Conexión al servicio y descarga de la flag |
-
-## Evidencia
-
-Todos los artefactos están en la carpeta [`loot/`](loot/):
-
-| Fichero                                | Contenido                                                      |
-| -------------------------------------- | -------------------------------------------------------------- |
-| [`ping.txt`](loot/ping.txt)            | Test de conectividad (TTL 63).                                 |
-| [`puertos.txt`](loot/puertos.txt)      | Escaneo completo de puertos (solo 21/tcp abierto).             |
-| [`detallado.txt`](loot/detallado.txt)  | Detección de versión y scripts (vsftpd 3.0.3, ftp-anon).       |
-| [`flag.txt`](loot/flag.txt)            | Flag descargada por FTP.                                       |
-
-## Referencias
+### D. Referencias generales
 
 - [Página de la máquina en HTB](https://app.hackthebox.com/machines/Fawn)
-- [CVE-2021-30047](https://www.cve.org/CVERecord?id=CVE-2021-30047)
-- [vsftpd – sitio oficial](https://security.appspot.com/vsftpd.html)
+- [PTES — Penetration Testing Execution Standard](http://www.pentest-standard.org/)
+- [Calculadora CVSS v3.1 — FIRST](https://www.first.org/cvss/calculator/3.1)
+- [MITRE ATT&CK](https://attack.mitre.org/)
