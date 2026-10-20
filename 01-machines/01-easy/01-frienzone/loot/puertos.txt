@@ -1,0 +1,14 @@
+# Nmap 7.992 scan initiated Mon Oct 19 19:43:57 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN loot/puertos.txt 10.129.86.28
+Nmap scan report for 10.129.86.28
+Host is up (0.16s latency).
+Not shown: 65528 closed tcp ports (conn-refused)
+PORT    STATE SERVICE
+21/tcp  open  ftp
+22/tcp  open  ssh
+53/tcp  open  domain
+80/tcp  open  http
+139/tcp open  netbios-ssn
+443/tcp open  https
+445/tcp open  microsoft-ds
+
+# Nmap done at Mon Oct 19 19:44:10 2026 -- 1 IP address (1 host up) scanned in 13.68 seconds
