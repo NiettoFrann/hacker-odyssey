@@ -26,28 +26,36 @@
 
 ---
 
+<div align="center">
+
 ## 🎯 Sobre el proyecto
 
-Este repositorio es mi bitácora de práctica ofensiva en **Hack The Box**. No son *write-ups* de
-"pegá este comando y listo": cada máquina se entrega como un **informe de prueba de penetración**
-con el formato que recibiría un cliente.
+Este repositorio es mi bitácora de práctica ofensiva en **Hack The Box**.<br>
+No son *write-ups* de "pegá este comando y listo": cada máquina se entrega<br>
+como un **informe de prueba de penetración** con el formato que recibiría un cliente.
 
-| | |
-|---|---|
+<br>
+
+| Característica | Detalle |
+|:---------------|:--------|
 | 🧾 **Formato profesional** | Resumen ejecutivo para no técnicos + detalle técnico para el equipo |
 | 🔎 **Evidencia real** | Salidas de herramientas, capturas y *loot* guardados junto a cada informe |
 | 🧮 **Hallazgos clasificados** | Severidad, CVSS y recomendación de mitigación por cada vulnerabilidad |
 | 🗺️ **Narrativa del ataque** | Reconocimiento → acceso inicial → escalada, paso a paso |
 | 🧱 **Estructura reproducible** | Plantilla única y script que arma cada máquina nueva |
 
+</div>
+
 ---
+
+<div align="center">
 
 ## 📚 Informes
 
 ### 🟢 Starting Point — Tier 0
 
 | ID | Máquina | Dificultad | Técnica clave | Riesgo |
-|:--:|---------|:----------:|---------------|:------:|
+|:--:|:-------:|:----------:|:--------------|:------:|
 | `HO-0001` | [Meow](00-starting-point/tier-0/00-meow/README.md) | ![](https://img.shields.io/badge/Very%20Easy-brightgreen) | Telnet con credenciales por defecto | 🔴 Crítico |
 | `HO-0002` | [Fawn](00-starting-point/tier-0/01-fawn/README.md) | ![](https://img.shields.io/badge/Very%20Easy-brightgreen) | FTP con login anónimo | 🟠 Alto |
 | `HO-0003` | [Redeemer](00-starting-point/tier-0/03-redeemer/README.md) | ![](https://img.shields.io/badge/Very%20Easy-brightgreen) | Redis sin autenticación | 🔴 Crítico |
@@ -58,11 +66,13 @@ con el formato que recibiría un cliente.
 ### 🟡 Machines — Easy
 
 | ID | Máquina | Dificultad | Técnica clave | Riesgo |
-|:--:|---------|:----------:|---------------|:------:|
+|:--:|:-------:|:----------:|:--------------|:------:|
 | `HO-0007` | [Cap](01-machines/01-easy/00-cap/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | IDOR → PCAP con credenciales FTP → *Linux capabilities* | 🔴 Crítico |
 | `HO-0008` | [FriendZone](01-machines/01-easy/01-frienzone/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | Transferencia de zona DNS → SMB → LFI → *module hijacking* | 🔴 Crítico |
 | `HO-0009` | [Inject](01-machines/01-easy/02-inject/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | LFI → Spring Cloud Function RCE → Ansible privesc | 🔴 Crítico |
 | `HO-0010` | [Shocker](01-machines/01-easy/03-shocker/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | Shellshock en `cgi-bin` → `sudo` mal configurado | 🔴 Crítico |
+
+</div>
 
 > [!NOTE]
 > Medium, Hard e Insane ya tienen su carpeta lista; se irán completando.
@@ -70,15 +80,13 @@ con el formato que recibiría un cliente.
 
 ---
 
-## 📊 Estadísticas
-
 <div align="center">
+
+## 📊 Estadísticas
 
 | Informes | Hallazgos totales | 🔴 Críticos | 🟠 Altos | 🟡 Medios | 🔵 Bajos | ⚪ Informativos |
 |:--------:|:-----------------:|:----------:|:-------:|:--------:|:-------:|:--------------:|
 | **10** | **24** | **8** | **8** | **6** | **1** | **1** |
-
-</div>
 
 ```mermaid
 pie showData title Hallazgos por severidad
@@ -95,7 +103,7 @@ pie showData title Hallazgos por severidad
 <br>
 
 | Patrón | Dónde aparece |
-|--------|---------------|
+|:-------|:--------------|
 | **Servicio expuesto sin autenticación** | Fawn, Redeemer, Mongod, Synced |
 | **Credenciales por defecto o débiles** | Meow, Preignition |
 | **Ejecución de código remoto (RCE)** | Inject, Shocker, FriendZone |
@@ -104,9 +112,15 @@ pie showData title Hallazgos por severidad
 
 </details>
 
+</div>
+
 ---
 
+<div align="center">
+
 ## 🗂️ Estructura del repositorio
+
+</div>
 
 ```text
 hack-the-box/
@@ -131,9 +145,12 @@ hack-the-box/
 
 ---
 
+<div align="center">
+
 ## 📝 Anatomía de un informe
 
-Todos los informes comparten la misma estructura, con metadatos en *front matter* (ID, objetivo, OS, dificultad, etiquetas).
+Todos los informes comparten la misma estructura, con metadatos en *front matter*<br>
+(ID, objetivo, OS, dificultad, etiquetas).
 
 ```mermaid
 flowchart LR
@@ -146,7 +163,7 @@ flowchart LR
 ```
 
 | Sección | Qué contiene |
-|---------|--------------|
+|:-------:|:-------------|
 | **Resumen ejecutivo** | Resultado en lenguaje claro, nivel de riesgo global y distribución de hallazgos |
 | **Alcance y metodología** | Objetivo, tipo de prueba (caja negra) y herramientas |
 | **Narrativa del ataque** | Reconocimiento, acceso inicial y escalada con evidencia |
@@ -154,15 +171,21 @@ flowchart LR
 | **Post-explotación** | Estado final del sistema y cómo se obtuvo cada flag |
 | **Conclusiones y anexos** | Recomendaciones generales, comandos y referencias |
 
+</div>
+
 ---
 
+<div align="center">
+
 ## ⚙️ Flujo de trabajo
+
+</div>
 
 **1. Crear la estructura de una máquina nueva**
 
 ```bash
 cd utils
-./new-machine.sh 01-machines/01-easy/04-nombre Linux Easy 10.10.10.XX
+./new-machine.sh <ruta-maquina> <S.O> <dificultad> <IP>
 ```
 
 Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts/` y el directorio de capturas.
@@ -172,6 +195,8 @@ Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts
 **3. Redactar el informe** con la skill `informe-pentest` de Claude Code, que convierte comandos, salidas y notas en un informe terminado y **no inventa datos**: lo que falta queda marcado como `⚠️ PENDIENTE`.
 
 ---
+
+<div align="center">
 
 ## 🧰 Herramientas habituales
 
@@ -183,9 +208,15 @@ Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts
 ![Bash](https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnubash&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
 
+</div>
+
 ---
 
+<div align="center">
+
 ## ⚠️ Aviso legal
+
+</div>
 
 > [!WARNING]
 > Todo el contenido de este repositorio se produjo sobre **entornos de laboratorio autorizados**
@@ -202,4 +233,3 @@ Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts
 *Aprender atacando, para aprender a defender.* 🔐
 
 </div>
-
