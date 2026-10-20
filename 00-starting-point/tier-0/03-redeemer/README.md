@@ -1,201 +1,233 @@
 ---
-title: Redeemer
+report_id: HO-0003-00
+target: Redeemer
+platform: Hack The Box
 os: Linux
-dificultad: Very Easy
+difficulty: Very Easy
 ip: 10.129.136.187
-fecha: 2026-10-17
-categoria: Starting Point
-estado: completada
-tags: [htb, linux, redis, unauthenticated-access]
+date: 2026-10-17
+version: 1.0
+author: Francisco Nieto
+status: Final
+tags: [htb, linux, very-easy, starting-point, redis, unauthenticated-access]
 ---
 
-# Redeemer — Informe de Pentest
+# Informe de Prueba de Penetración — Redeemer
 
-> Writeup de la máquina **Redeemer** de [Hack The Box](https://www.hackthebox.com/). Documento con fines educativos, realizado en un entorno de laboratorio autorizado.
+| | |
+|---|---|
+| **ID de informe** | HO-0003-00 |
+| **Objetivo** | Redeemer (`10.129.136.187`) |
+| **Plataforma** | Hack The Box — Starting Point (Tier 0) |
+| **Tipo de prueba** | Caja negra (black box) |
+| **Fecha de ejecución** | 2026-10-17 |
+| **Autor** | Francisco Nieto — [@NiettoFrann](https://github.com/NiettoFrann) |
+| **Versión** | 1.0 |
+| **Clasificación** | Público — uso educativo |
 
-## Información general
+> **Aviso legal.** Las pruebas se realizaron sobre un entorno de laboratorio autorizado
+> (Hack The Box). Ninguna técnica descrita debe aplicarse sobre sistemas sin autorización
+> expresa por escrito de su propietario.
 
-| Campo                   | Detalle         |
-| ----------------------- | --------------- |
-| **Máquina**             | Redeemer        |
-| **Sistema operativo**   | Linux           |
-| **Dificultad**          | Very Easy       |
-| **Categoría**           | Starting Point  |
-| **Dirección IP**        | `10.129.136.187`|
-| **Fecha de resolución** | 2026-10-17      |
-| **Autor del informe**   | NiettoFrann     |
-| **Estado**              | Completada      |
+### Control de versiones
+
+| Versión | Fecha | Descripción |
+|---------|-------|-------------|
+| 1.0 | 2026-10-17 | Versión inicial |
+
+---
 
 ## Índice
 
-1. [Resumen ejecutivo](#resumen-ejecutivo)
-2. [Alcance y metodología](#alcance-y-metodología)
-3. [Cadena de ataque](#cadena-de-ataque)
-4. [Reconocimiento](#reconocimiento)
-5. [Enumeración](#enumeración)
-6. [Explotación (Foothold)](#explotación-foothold)
-7. [Escalada de privilegios](#escalada-de-privilegios)
-8. [Flags](#flags)
-9. [Vulnerabilidades identificadas](#vulnerabilidades-identificadas)
-10. [Recomendaciones de mitigación](#recomendaciones-de-mitigación)
-11. [Lecciones aprendidas](#lecciones-aprendidas)
-12. [Herramientas utilizadas](#herramientas-utilizadas)
-13. [Evidencia](#evidencia)
-14. [Referencias](#referencias)
+1. [Resumen ejecutivo](#1-resumen-ejecutivo)
+2. [Alcance y metodología](#2-alcance-y-metodología)
+3. [Narrativa del ataque](#3-narrativa-del-ataque)
+4. [Hallazgos técnicos](#4-hallazgos-técnicos)
+5. [Post-explotación](#5-post-explotación)
+6. [Conclusiones](#6-conclusiones)
+7. [Anexos](#7-anexos)
 
 ---
 
-## Resumen ejecutivo
+## 1. Resumen ejecutivo
 
-La máquina `Redeemer` se comprometió a través de una instancia de **Redis sin autenticación**.
+### 1.1 Objetivo
 
-- El único puerto abierto es el **6379/tcp (Redis)**, con `Redis 5.0.7`.
-- El servidor no exige contraseña (`requirepass` no configurado), por lo que `redis-cli` se conecta directamente con privilegios completos sobre la base de datos.
-- No fue necesario explotar ninguna vulnerabilidad de software: bastó con conectarse y listar las claves (`KEYS *`) para localizar y leer la flag almacenada como valor.
+Evaluar la seguridad del host **Redeemer** simulando un atacante externo sin credenciales
+ni conocimiento previo del entorno, con el fin de obtener el máximo nivel de acceso
+posible.
 
-**Impacto:** cualquier persona con conectividad de red al puerto 6379 puede leer, modificar o borrar todos los datos almacenados en Redis sin autenticarse, y en configuraciones más permisivas (módulos, `CONFIG SET dir/dbfilename`) esto puede escalar a ejecución remota de código.
+### 1.2 Resultado
 
-## Alcance y metodología
+> El servidor expone una base de datos a la red sin pedir ningún tipo de contraseña. Con
+> solo conectarse, cualquier persona puede ver, modificar o borrar toda la información
+> almacenada. Un atacante real podría robar datos, destruirlos o alterarlos, y en
+> configuraciones más permisivas podría llegar a tomar control del propio servidor.
 
-- **Objetivo:** `10.129.136.187` (Redeemer)
-- **Tipo de prueba:** caja negra, sin credenciales previas.
-- **Metodología:** Reconocimiento → Enumeración → Explotación → Post-explotación / Escalada de privilegios → Documentación.
-- **Entorno:** conexión a la VPN de HTB desde Linux.
+**Nivel de riesgo global:** `CRÍTICO`
 
-## Cadena de ataque
+### 1.3 Distribución de hallazgos
 
-```text
-Ping (TTL 63 → Linux) -> Escaneo de 65535 puertos (solo 6379/tcp) -> Escaneo detallado (Redis 5.0.7)
-  -> Conexión con redis-cli sin autenticación -> KEYS * -> GET flag
+| Crítica | Alta | Media | Baja | Informativa |
+|:-------:|:----:|:-----:|:----:|:-----------:|
+| 1 | 0 | 1 | 0 | 0 |
+
+### 1.4 Resumen de hallazgos
+
+| ID | Hallazgo | Severidad | CVSS |
+|----|----------|-----------|------|
+| [HO-0003-01](#ho-0003-01--redis-expuesto-sin-autenticación) | Redis expuesto sin autenticación | Crítica | 9.8 |
+| [HO-0003-02](#ho-0003-02--tráfico-redis-sin-cifrar) | Tráfico Redis sin cifrar | Media | 5.9 |
+
+### 1.5 Recomendaciones prioritarias
+
+1. Configurar `requirepass` (o ACLs en Redis 6+) con una contraseña robusta.
+2. Vincular Redis a una interfaz interna (`bind 127.0.0.1`) y restringir el puerto 6379 por firewall.
+3. Cifrar el tráfico (TLS o túnel SSH/VPN) y deshabilitar comandos peligrosos con `rename-command`.
+
+---
+
+## 2. Alcance y metodología
+
+### 2.1 Alcance
+
+| Activo | Dirección | Incluido |
+|--------|-----------|:--------:|
+| Redeemer | `10.129.136.187` | Sí |
+
+**Fuera de alcance:** ataques de denegación de servicio, infraestructura de la
+plataforma y otros jugadores.
+
+### 2.2 Metodología
+
+La prueba siguió las fases del estándar **PTES** (Penetration Testing Execution
+Standard):
+
+1. **Reconocimiento** — descubrimiento de puertos y servicios.
+2. **Enumeración** — identificación de versiones y superficie de ataque.
+3. **Análisis de vulnerabilidades** — validación manual de posibles fallos.
+4. **Explotación** — obtención de acceso inicial.
+5. **Post-explotación** — recolección de evidencia.
+6. **Reporte** — documentación de hallazgos y recomendaciones.
+
+### 2.3 Entorno del auditor
+
+| Componente | Detalle |
+|------------|---------|
+| Sistema | Linux (kernel 7.2.11-zen1-1-zen) |
+| Conexión | VPN de Hack The Box |
+| Herramientas | ping, nmap 7.991, redis-cli |
+
+### 2.4 Clasificación de severidad
+
+Las vulnerabilidades se puntúan con **CVSS v3.1** (ver tabla de criterios estándar).
+
+---
+
+## 3. Narrativa del ataque
+
+### 3.1 Cadena de compromiso
+
+```mermaid
+flowchart LR
+    A["Reconocimiento<br/>6379/tcp"] --> B["HO-0003-01<br/>Redis sin autenticación"]
+    B --> C["INFO / KEYS *"]
+    C --> D["GET flag"]
 ```
 
----
+### 3.2 Reconocimiento
 
-## Reconocimiento
-
-### Conectividad y sistema operativo
-
-Se comprobó que el host responde y se infirió el sistema operativo a partir del TTL.
+Verificación de conectividad:
 
 ```bash
 ping -c 1 10.129.136.187 | tee loot/ping.txt
 ```
 
-```text
-PING 10.129.136.187 (10.129.136.187) 56(84) bytes of data.
-64 bytes from 10.129.136.187: icmp_seq=1 ttl=63 time=240 ms
+El TTL de respuesta es 63; los sistemas Linux parten de 64 y el valor restante indica un
+salto intermedio (VPN), por lo que se infiere un sistema **Linux**.
 
---- 10.129.136.187 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 239.759/239.759/239.759/0.000 ms
-```
-
-> Evidencia: [`loot/ping.txt`](loot/ping.txt)
-
-| Dato     | Valor   | Interpretación                                                                                             |
-| -------- | ------- | ------------------------------------------------------------------------------------------------------------ |
-| Latencia | ~240 ms | Host activo, alcanzable por la VPN.                                                                          |
-| TTL      | `63`    | Los sistemas Linux/Unix parten de TTL 64; el valor 63 indica un salto intermedio (VPN). Sistema **Linux**.    |
-
-### Escaneo de puertos
-
-Primero se escanearon **todos los puertos TCP** de forma rápida para descubrir la superficie de ataque:
+Descubrimiento de puertos abiertos:
 
 ```bash
 nmap -p- --min-rate=5000 -T4 -Pn -n 10.129.136.187 -oN loot/puertos.txt
 ```
 
-```text
-Nmap scan report for 10.129.136.187
-Host is up (0.24s latency).
-Not shown: 65534 closed tcp ports (conn-refused)
-PORT     STATE SERVICE
-6379/tcp open  redis
-```
-
-> Evidencia: [`loot/puertos.txt`](loot/puertos.txt)
-
-| Opción            | Motivo                                                   |
-| ----------------- | --------------------------------------------------------- |
-| `-p-`              | Todos los puertos (1-65535).                              |
-| `--min-rate=5000`  | Envía al menos 5000 paquetes/s para acelerar el escaneo.   |
-| `-T4`              | Plantilla de tiempos agresiva.                             |
-| `-Pn`              | Omite el descubrimiento de host (se asume activo).        |
-| `-n`               | Sin resolución DNS.                                       |
-| `-oN`              | Guarda la salida en formato normal.                        |
-
-**Resultado:** 65534 puertos cerrados y un único puerto abierto.
-
-| Puerto   | Estado | Servicio |
-| -------- | ------ | -------- |
-| 6379/tcp | open   | redis    |
-
-Sobre el puerto descubierto se lanzó un escaneo de **detección de versiones y scripts por defecto**:
+Detección de servicios y versiones:
 
 ```bash
 nmap -p6379 -sCV -Pn -n -T4 10.129.136.187 -oN loot/detallado.txt
 ```
 
-```text
-PORT     STATE SERVICE VERSION
-6379/tcp open  redis   Redis key-value store 5.0.7
-```
+| Puerto | Servicio | Versión | Observaciones |
+|--------|----------|---------|---------------|
+| 6379/tcp | Redis | Redis key-value store 5.0.7 | Único puerto abierto; principal superficie de ataque. |
 
-> Evidencia: [`loot/detallado.txt`](loot/detallado.txt)
+> Salida completa en el [Anexo A](#a-salida-completa-de-escaneos).
 
-| Opción  | Motivo                                               |
-| ------- | ----------------------------------------------------- |
-| `-p6379`| Limita el escaneo al puerto encontrado.                |
-| `-sC`   | Ejecuta los scripts NSE por defecto.                   |
-| `-sV`   | Detecta la versión del servicio.                       |
+### 3.3 Enumeración
 
-**Resultado:**
-
-| Puerto   | Estado | Servicio | Versión                     |
-| -------- | ------ | -------- | ---------------------------- |
-| 6379/tcp | open   | redis    | `Redis key-value store 5.0.7`|
-
-## Enumeración
-
-### Redis (6379/tcp)
-
-Se usó `redis-cli` para conectarse directamente al servicio y comprobar si exigía autenticación:
+Se utilizó `redis-cli` para comprobar si el servicio exigía autenticación:
 
 ```bash
 redis-cli -h 10.129.136.187 -p 6379
 10.129.136.187:6379> info
 ```
 
-La sección `# Server` confirma la versión y el sistema operativo subyacente:
+El comando `INFO` se ejecutó sin solicitar credenciales. Reveló `redis_version:5.0.7`,
+`os:Linux 5.4.0-77-generic x86_64` y `config_file:/etc/redis/redis.conf`, además de que la
+base de datos 0 contiene 4 claves (`db0:keys=4`).
 
-```text
-redis_version:5.0.7
-os:Linux 5.4.0-77-generic x86_64
-run_id:4a52cf9822e061dfbbe2e2f0e656fd255b393447
-```
+### 3.4 Acceso inicial
 
-La conexión se estableció y el comando `INFO` se ejecutó **sin solicitar ninguna credencial**, lo que confirma que el servidor no tiene configurada la directiva `requirepass` en `redis.conf`.
+Listado de claves y lectura de la clave `flag`. Ver
+**[HO-0003-01](#ho-0003-01--redis-expuesto-sin-autenticación)**.
 
-También se observó en `# Keyspace` que la base de datos 0 contiene claves:
+### 3.5 Movimiento lateral
 
-```text
-db0:keys=4,expires=0,avg_ttl=0
-```
+No aplica.
 
-> Evidencia: [`loot/redis.txt`](loot/redis.txt)
+### 3.6 Escalada de privilegios
 
-## Explotación (Foothold)
+No aplica: el objetivo de la máquina se cumple con el acceso no autenticado a Redis y no
+se obtuvo una shell en el sistema.
 
-- **Vulnerabilidad:** instancia de Redis expuesta sin autenticación (configuración insegura, no un fallo de software).
-- **Referencia:** [CWE-306 – Missing Authentication for Critical Function](https://cwe.mitre.org/data/definitions/306.html) / [Redis Security](https://redis.io/docs/management/security/).
-- **Impacto:** lectura y escritura completa sobre todos los datos almacenados en la base, sin autenticar.
+---
 
-### Procedimiento
+## 4. Hallazgos técnicos
 
-Con el acceso ya autenticado de forma implícita (sin contraseña), se listaron las claves existentes y se consultó cada una:
+### HO-0003-01 — Redis expuesto sin autenticación
+
+| | |
+|---|---|
+| **Severidad** | Crítica |
+| **CVSS v3.1** | 9.8 — `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H` |
+| **CWE** | [CWE-306](https://cwe.mitre.org/data/definitions/306.html) — Missing Authentication for Critical Function |
+| **CVE** | — |
+| **Componente afectado** | Redis 5.0.7 — `10.129.136.187:6379/tcp` |
+| **Estado** | Explotada |
+
+#### Descripción
+
+La instancia de Redis acepta conexiones desde la red sin exigir contraseña: no está
+configurada la directiva `requirepass` y el servicio no está limitado a una interfaz
+interna. La causa raíz es una configuración insegura, no un fallo de software.
+
+**Justificación del vector:** acceso por red, sin autenticación ni interacción y con
+control completo de lectura y escritura sobre los datos y capacidad de afectar la
+disponibilidad (por ejemplo, con comandos de borrado).
+
+#### Prueba de concepto
+
+**Paso 1.** Conexión sin credenciales y consulta de información del servidor.
 
 ```bash
 redis-cli -h 10.129.136.187 -p 6379
+10.129.136.187:6379> info
+```
+
+**Paso 2.** Selección de la base de datos y enumeración de claves.
+
+```bash
 10.129.136.187:6379> select 0
 OK
 10.129.136.187:6379> keys *
@@ -203,82 +235,181 @@ OK
 2) "stor"
 3) "numb"
 4) "flag"
+```
+
+**Paso 3.** Lectura de la clave `flag`.
+
+```bash
 10.129.136.187:6379> get flag
-"03e1d2b376c37ab3f5319922053953eb"
 ```
 
-`KEYS *` enumera todas las claves de la base de datos seleccionada y `GET flag` devuelve el valor de la clave `flag`, que contiene la flag del reto:
+#### Impacto
 
-```text
-03e1d2b376c37ab3f5319922053953eb
-```
+- **Confidencialidad:** lectura de todos los datos almacenados.
+- **Integridad:** modificación de cualquier clave.
+- **Disponibilidad:** borrado de datos.
+- **Escalada potencial (no probada):** abuso de `CONFIG SET dir` / `dbfilename` para escribir
+  un `authorized_keys` o un webshell, o `MODULE LOAD`, lo que permitiría ejecución remota
+  de código.
 
-> Evidencia: [`loot/redis.txt`](loot/redis.txt) y [`loot/flag.txt`](loot/flag.txt)
+#### Remediación
 
-## Escalada de privilegios
+- **Corto plazo:** configurar `requirepass` (o ACLs) con una contraseña robusta y bloquear
+  el puerto 6379 por firewall.
+- **Largo plazo:** vincular Redis a `127.0.0.1` o a una red interna, deshabilitar
+  comandos peligrosos (`CONFIG`, `FLUSHALL`, `MODULE LOAD`) con `rename-command` y no
+  almacenar información sensible en claro.
 
-No fue necesaria. El objetivo de la máquina (obtener la flag) se cumple con el acceso no autenticado a Redis mediante `redis-cli`, sin llegar a obtener una shell en el sistema. Por ello no hay vector de escalada que documentar.
+#### Referencias
 
-> Nota: en un escenario real, un Redis sin autenticación suele poder escalarse a ejecución remota de código abusando de `CONFIG SET dir` / `CONFIG SET dbfilename` para escribir una clave SSH autorizada (`authorized_keys`) o un webshell, o cargando el módulo `MODULE LOAD`. No se requirió en este ejercicio porque la flag ya era accesible directamente como valor de una clave.
+- [Redis — Security](https://redis.io/docs/management/security/)
+- [CWE-306 — Missing Authentication for Critical Function](https://cwe.mitre.org/data/definitions/306.html)
+- [HackTricks — Pentesting Redis](https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis)
 
 ---
 
-## Flags
+### HO-0003-02 — Tráfico Redis sin cifrar
 
-| Flag     | Valor                              |
-| -------- | ----------------------------------- |
-| `flag`   | `03e1d2b376c37ab3f5319922053953eb` |
+| | |
+|---|---|
+| **Severidad** | Media |
+| **CVSS v3.1** | 5.9 — `CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N` |
+| **CWE** | [CWE-319](https://cwe.mitre.org/data/definitions/319.html) — Cleartext Transmission of Sensitive Information |
+| **CVE** | — |
+| **Componente afectado** | Redis 5.0.7 — `10.129.136.187:6379/tcp` |
+| **Estado** | Identificada |
 
-> Redeemer pertenece a Starting Point: solo existe una flag, obtenida directamente desde Redis (no hay `user.txt` / `root.txt`). Evidencia: [`loot/flag.txt`](loot/flag.txt).
+#### Descripción
 
-## Vulnerabilidades identificadas
+Redis transmite comandos y datos sin cifrar. TLS no está disponible en la versión
+5.0.7 (se incorporó en Redis 6). Esto fue inferido de la versión detectada y no se
+verificó con una captura de tráfico.
 
-| # | Vulnerabilidad                         | Severidad | CVSS | Componente      | Mitigación                                                            |
-| - | --------------------------------------- | --------- | ---- | --------------- | ----------------------------------------------------------------------- |
-| 1 | Redis expuesto sin autenticación        | Crítica   | N/A  | Redis (6379/tcp)| Configurar `requirepass` o ACLs y restringir el acceso por firewall.   |
-| 2 | Redis accesible desde la red externa    | Alta      | N/A  | Redis (6379/tcp)| Vincular Redis a `127.0.0.1` o a una red interna, usar `bind`/firewall.|
-| 3 | Tráfico Redis sin cifrar                | Media     | N/A  | Redis (6379/tcp)| Usar TLS (soportado desde Redis 6) o un túnel SSH/VPN.                  |
+**Justificación del vector:** requiere posición de intermediario en la red (`AC:H`).
 
-> Severidad: Crítica / Alta / Media / Baja / Informativa. Los valores CVSS no se calcularon para los hallazgos de configuración.
+#### Prueba de concepto
 
-## Recomendaciones de mitigación
+Versión obtenida de `nmap -sCV` e `INFO` (ver [Anexo A](#a-salida-completa-de-escaneos)).
 
-- [ ] Configurar `requirepass` (o ACLs de usuario en Redis 6+) con una contraseña robusta.
-- [ ] Vincular Redis solo a interfaces internas (`bind 127.0.0.1`) y no exponerlo a redes públicas.
-- [ ] Restringir el acceso al puerto 6379 mediante firewall a las IP necesarias.
-- [ ] Deshabilitar comandos peligrosos (`CONFIG`, `FLUSHALL`, `MODULE LOAD`, etc.) con `rename-command` cuando no se necesiten.
-- [ ] Mantener el software y los servicios actualizados.
-- [ ] No almacenar información sensible en claro dentro de Redis si el servicio es accesible por terceros.
+#### Impacto
 
-## Lecciones aprendidas
+- **Confidencialidad:** un atacante con visibilidad del tráfico podría leer contenido y
+  credenciales si se configuraran.
 
-- Redis, por defecto, no exige autenticación; conviene probar siempre una conexión directa con `redis-cli` cuando se detecta el puerto 6379.
-- `INFO` y `KEYS *` son suficientes para una enumeración rápida de un Redis mal configurado, sin necesidad de exploits.
-- El TTL de un `ping` da una pista rápida del sistema operativo (64 ≈ Linux, 128 ≈ Windows).
-- Escanear primero todos los puertos y luego profundizar solo en los abiertos ahorra tiempo.
+#### Remediación
 
-## Herramientas utilizadas
+- **Corto plazo:** acceder a Redis solo a través de un túnel SSH o VPN.
+- **Largo plazo:** actualizar a una versión con soporte TLS y habilitarlo.
 
-| Herramienta  | Uso                                        |
-| ------------ | ------------------------------------------- |
-| ping         | Test de conectividad y estimación del SO    |
-| nmap         | Escaneo de puertos, versiones y scripts     |
-| redis-cli    | Conexión al servicio Redis y lectura de claves |
+#### Referencias
 
-## Evidencia
+- [Redis — TLS](https://redis.io/docs/management/security/encryption/)
 
-Todos los artefactos están en la carpeta [`loot/`](loot/):
+---
 
-| Fichero                                  | Contenido                                                       |
-| ----------------------------------------- | ----------------------------------------------------------------- |
-| [`ping.txt`](loot/ping.txt)               | Test de conectividad (TTL 63).                                    |
-| [`puertos.txt`](loot/puertos.txt)         | Escaneo completo de puertos (solo 6379/tcp abierto).              |
-| [`detallado.txt`](loot/detallado.txt)     | Detección de versión (Redis 5.0.7).                                |
-| [`redis.txt`](loot/redis.txt)             | Sesión de `redis-cli`: `INFO`, `KEYS *` y `GET flag`.              |
-| [`flag.txt`](loot/flag.txt)               | Flag obtenida desde la clave `flag` de Redis.                      |
+## 5. Post-explotación
 
-## Referencias
+### 5.1 Acceso obtenido
+
+| Nivel | Usuario | Método | Prueba |
+|-------|---------|--------|--------|
+| Datos Redis (sin shell) | — | HO-0003-01 | clave `flag` — `03e1d2b3************************` |
+
+> Redeemer pertenece a Starting Point: solo existe una flag y no hay `user.txt` / `root.txt`.
+
+### 5.2 Información sensible expuesta
+
+| Tipo | Ubicación | Observación |
+|------|-----------|-------------|
+| Datos de aplicación | Redis db0 — claves `temp`, `stor`, `numb`, `flag` | Legibles sin autenticación. |
+| Información del sistema | Salida de `INFO` | Versión del servicio, kernel y ruta de configuración. |
+
+> Las flags se muestran parcialmente censuradas.
+
+### 5.3 Limpieza
+
+| Artefacto | Ubicación | Estado |
+|-----------|-----------|--------|
+| — | — | No se escribieron claves ni archivos en el objetivo. |
+
+---
+
+## 6. Conclusiones
+
+### 6.1 Conclusión técnica
+
+El compromiso se debió a un servicio de base de datos expuesto a la red sin
+autenticación. Bastó con `INFO` y `KEYS *` para enumerar y leer la información; no fue
+necesario ningún exploit.
+
+### 6.2 Aprendizajes del auditor
+
+- Redis no exige autenticación por defecto: ante el puerto 6379 conviene probar
+  `redis-cli` directamente.
+- `INFO` y `KEYS *` bastan para una enumeración rápida.
+- El TTL del `ping` da una pista rápida del SO (64 ≈ Linux, 128 ≈ Windows).
+
+---
+
+## 7. Anexos
+
+### A. Salida completa de escaneos
+
+<details>
+<summary>nmap — todos los puertos</summary>
+
+```text
+# Nmap 7.991 scan initiated Sat Oct 17 12:57:01 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN puertos.txt 10.129.136.187
+Nmap scan report for 10.129.136.187
+Host is up (0.24s latency).
+Not shown: 65534 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+6379/tcp open  redis
+
+# Nmap done at Sat Oct 17 12:57:20 2026 -- 1 IP address (1 host up) scanned in 18.47 seconds
+```
+
+</details>
+
+<details>
+<summary>nmap — escaneo de servicios</summary>
+
+```text
+# Nmap 7.991 scan initiated Sat Oct 17 12:58:22 2026 as: nmap -p6379 -sCV -Pn -n -T4 -oN detallado.txt 10.129.136.187
+Nmap scan report for 10.129.136.187
+Host is up (0.24s latency).
+
+PORT     STATE SERVICE VERSION
+6379/tcp open  redis   Redis key-value store 5.0.7
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Oct 17 12:58:29 2026 -- 1 IP address (1 host up) scanned in 7.44 seconds
+```
+
+</details>
+
+<details>
+<summary>redis-cli — sesión completa (INFO, KEYS, GET)</summary>
+
+Disponible en [`loot/redis.txt`](loot/redis.txt).
+
+</details>
+
+### B. Scripts y exploits
+
+No se utilizaron scripts ni exploits.
+
+### C. Mapeo MITRE ATT&CK
+
+| Táctica | Técnica | ID |
+|---------|---------|----|
+| Initial Access | Exploit Public-Facing Application | [T1190](https://attack.mitre.org/techniques/T1190/) |
+| Discovery | System Information Discovery | [T1082](https://attack.mitre.org/techniques/T1082/) |
+| Collection | Data from Information Repositories | [T1213](https://attack.mitre.org/techniques/T1213/) |
+
+### D. Referencias generales
 
 - [Página de la máquina en HTB](https://app.hackthebox.com/machines/Redeemer)
-- [Redis Security — documentación oficial](https://redis.io/docs/management/security/)
-- [HackTricks — Pentesting Redis](https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis)
+- [PTES — Penetration Testing Execution Standard](http://www.pentest-standard.org/)
+- [Calculadora CVSS v3.1 — FIRST](https://www.first.org/cvss/calculator/3.1)
+- [MITRE ATT&CK](https://attack.mitre.org/)
