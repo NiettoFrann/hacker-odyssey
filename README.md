@@ -123,7 +123,7 @@ pie showData title Hallazgos por severidad
 </div>
 
 ```text
-hack-the-box/
+hacker-odyssey/
 ├── 00-starting-point/        # Starting Point (Tier 0, 1 y 2)
 │   └── tier-0/
 │       └── 00-meow/
