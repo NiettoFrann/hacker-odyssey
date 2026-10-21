@@ -9,8 +9,8 @@
 <br>
 
 ![Hack The Box](https://img.shields.io/badge/Hack%20The%20Box-9FEF00?style=for-the-badge&logo=hackthebox&logoColor=black)
-![Informes](https://img.shields.io/badge/informes-10-blue?style=for-the-badge)
-![Hallazgos](https://img.shields.io/badge/hallazgos-24-red?style=for-the-badge)
+![Informes](https://img.shields.io/badge/informes-11-blue?style=for-the-badge)
+![Hallazgos](https://img.shields.io/badge/hallazgos-29-red?style=for-the-badge)
 ![Idioma](https://img.shields.io/badge/idioma-espa%C3%B1ol-orange?style=for-the-badge)
 ![Markdown](https://img.shields.io/badge/formato-Markdown-lightgrey?style=for-the-badge&logo=markdown&logoColor=black)
 
@@ -63,6 +63,12 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 | `HO-0005` | [Mongod](00-starting-point/tier-0/06-mongod/README.md) | ![](https://img.shields.io/badge/Very%20Easy-brightgreen) | MongoDB sin autenticación | 🔴 Crítico |
 | `HO-0006` | [Synced](00-starting-point/tier-0/07-synced/README.md) | ![](https://img.shields.io/badge/Very%20Easy-brightgreen) | Rsync sin autenticación | 🟠 Alto |
 
+### 🟢 Starting Point — Tier 2
+
+| ID | Máquina | Dificultad | Técnica clave | Riesgo |
+|:--:|:-------:|:----------:|:--------------|:------:|
+| `HO-0011` | [Base](00-starting-point/tier-2/06-base/README.md) | ![](https://img.shields.io/badge/Very%20Easy-brightgreen) | Type Juggling (bypass de login) → webshell (RCE) → reutilización de credenciales → `sudo find` | 🔴 Crítico |
+
 ### 🟡 Machines — Easy
 
 | ID | Máquina | Dificultad | Técnica clave | Riesgo |
@@ -76,7 +82,7 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 
 > [!NOTE]
 > Medium, Hard e Insane ya tienen su carpeta lista; se irán completando.
-> Los Tiers 1 y 2 de Starting Point están creados y pendientes de documentar.
+> El Tier 1 y el resto del Tier 2 de Starting Point están creados y pendientes de documentar.
 
 ---
 
@@ -86,13 +92,13 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 
 | Informes | Hallazgos totales | 🔴 Críticos | 🟠 Altos | 🟡 Medios | 🔵 Bajos | ⚪ Informativos |
 |:--------:|:-----------------:|:----------:|:-------:|:--------:|:-------:|:--------------:|
-| **10** | **24** | **8** | **8** | **6** | **1** | **1** |
+| **11** | **29** | **9** | **11** | **7** | **1** | **1** |
 
 ```mermaid
 pie showData title Hallazgos por severidad
-    "Crítica" : 8
-    "Alta" : 8
-    "Media" : 6
+    "Crítica" : 9
+    "Alta" : 11
+    "Media" : 7
     "Baja" : 1
     "Informativa" : 1
 ```
@@ -105,10 +111,10 @@ pie showData title Hallazgos por severidad
 | Patrón | Dónde aparece |
 |:-------|:--------------|
 | **Servicio expuesto sin autenticación** | Fawn, Redeemer, Mongod, Synced |
-| **Credenciales por defecto o débiles** | Meow, Preignition |
-| **Ejecución de código remoto (RCE)** | Inject, Shocker, FriendZone |
-| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone |
-| **Divulgación de información / LFI** | Cap, FriendZone, Inject |
+| **Credenciales por defecto o débiles** | Meow, Preignition, Base |
+| **Ejecución de código remoto (RCE)** | Inject, Shocker, FriendZone, Base |
+| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone, Base |
+| **Divulgación de información / LFI** | Cap, FriendZone, Inject, Base |
 
 </details>
 
