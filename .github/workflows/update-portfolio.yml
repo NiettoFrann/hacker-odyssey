@@ -1,0 +1,17 @@
+name: Actualizar portfolio
+
+# Redespliega el portfolio para que recalcule informes, hallazgos y fecha
+on:
+  push:
+    branches: [main]
+    paths: ['**/README.md']
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar deploy hook de Vercel
+        run: curl --fail --silent --show-error -X POST "$DEPLOY_HOOK"
+        env:
+          DEPLOY_HOOK: ${{ secrets.PORTFOLIO_DEPLOY_HOOK }}
