@@ -204,11 +204,7 @@ formulario que parsea XML del lado del servidor es un candidato inmediato a **XX
 que se orientó la prueba a esa técnica. Ver
 **[HO-0012-01](#ho-0012-01--inyección-de-entidades-externas-xml-xxe-en-el-formulario-de-reportes)**.
 
-<p align="center">
-  <img src="../../../assets/images/screenshots/04-bounty-hunter/01-log-submit.png" alt="Figura 1 — Formulario de reporte de errores en log_submit.php">
-  <br>
-  <em>Figura 1 — Formulario de reporte de errores (<code>log_submit.php</code>).</em>
-</p>
+![Figura 1 — Formulario de reporte de errores en log_submit.php](../../../assets/images/screenshots/04-bounty-hunter/01-log-submit.png)
 
 ### 3.4 Acceso inicial
 
@@ -312,13 +308,7 @@ $dbpassword = "m19RoAU0************";
 $testuser   = "test";
 ```
 
-<div align='center'>
-<p align="center">
-  <img src="../../../assets/images/screenshots/04-bounty-hunter/02-burpsuite-db-php.png" alt="Figura 2 — Respuesta con el contenido de db.php codificado en base64">
-  <br>
-  <em>Figura 2 — Lectura de <code>db.php</code> vía XXE con <code>php://filter</code>.</em>
-</p>
-</div>
+![Figura 2 — Respuesta con el contenido de db.php codificado en base64](../../../assets/images/screenshots/04-bounty-hunter/02-burpsuite-db-php.png)
 
 #### Impacto
 
