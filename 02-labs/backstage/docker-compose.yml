@@ -1,0 +1,10 @@
+services:
+  backstage:
+    build: .
+    image: hacker-odyssey/backstage:latest
+    container_name: backstage
+    hostname: backstage
+    ports:
+      - "8080:80"    # http  ->  http://127.0.0.1:8080
+      - "2222:22"    # ssh   ->  ssh ... -p 2222
+    restart: "no"
