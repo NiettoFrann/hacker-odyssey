@@ -1,0 +1,6 @@
+Artefacto de build interno de Foundry.
+
+Clave de mantenimiento del pipeline (no distribuir).
+Usuario del host para despliegues: builder
+
+  ssh -i id_rsa builder@<host>
