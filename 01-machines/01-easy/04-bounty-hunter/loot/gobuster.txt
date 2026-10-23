@@ -1,0 +1,24 @@
+gobuster dir -u http://10.129.95.166 -w /usr/share/seclists/Discovery/Web-Content/common.txt --add-slash -t 100 -b 403,404 
+===============================================================
+Gobuster v3.8.2
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.129.95.166
+[+] Method:                  GET
+[+] Threads:                 100
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/common.txt
+[+] Negative Status codes:   403,404
+[+] User Agent:              gobuster/3.8.2
+[+] Add Slash:               true
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+index.php/           (Status: 200) [Size: 25169]
+resources/           (Status: 200) [Size: 2841]
+Progress: 4751 / 4751 (100.00%)
+===============================================================
+Finished
+===============================================================
+
+
