@@ -1,0 +1,10 @@
+services:
+  foundry:
+    build: .
+    image: hacker-odyssey/foundry:latest
+    container_name: foundry
+    hostname: foundry
+    ports:
+      - "8081:80"    # http  ->  http://127.0.0.1:8081
+      - "2223:22"    # ssh   ->  ssh ... -p 2223
+    restart: "no"
