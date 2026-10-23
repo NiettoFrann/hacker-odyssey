@@ -1,0 +1,15 @@
+# Respaldo de configuración del VirtualHost (generado durante la migración)
+# TODO sysadmin: mover este backup fuera del webroot antes de produccion.
+
+<Directory /var/www/html/internal>
+    AuthType Basic
+    AuthName "Backstage Internal - Restricted"
+    AuthUserFile /etc/apache2/.htpasswd
+    Require valid-user
+</Directory>
+
+# El panel interno hospeda, ademas del editor, el material operativo del equipo:
+#   - claves de acceso a los servidores (ver internal/)
+#   - usuario de mantenimiento del host: jmanning
+#
+# Credenciales del panel: ver respaldo htpasswd.bak en este mismo directorio.
