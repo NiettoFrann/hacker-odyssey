@@ -1,0 +1,12 @@
+# Nmap 7.992 scan initiated Fri Oct 23 21:22:44 2026 as: nmap -p- --min-rate=5000 -T4 -Pn -n -oN puertos.txt 127.0.0.1
+Nmap scan report for 127.0.0.1
+Host is up (0.000076s latency).
+Not shown: 65530 closed tcp ports (conn-refused)
+PORT      STATE SERVICE
+2224/tcp  open  efi-mg
+6600/tcp  open  mshvlm
+8082/tcp  open  blackice-alerts
+33928/tcp open  unknown
+39017/tcp open  unknown
+
+# Nmap done at Fri Oct 23 21:22:45 2026 -- 1 IP address (1 host up) scanned in 1.17 seconds
