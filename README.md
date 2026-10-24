@@ -33,14 +33,14 @@ Este repositorio es mi <b>bitácora de práctica ofensiva en Hack The Box</b>. N
 
 <div align="center">
 
-| Característica | Detalle |
-|:---------------|:--------|
-| 🧾 **Formato profesional** | Resumen ejecutivo para no técnicos + detalle técnico para el equipo |
-| 🔎 **Evidencia real** | Salidas de herramientas, capturas y *loot* guardados junto a cada informe |
-| 🧮 **Hallazgos clasificados** | Severidad, CVSS y recomendación de mitigación por cada vulnerabilidad |
-| 🗺️ **Narrativa del ataque** | Reconocimiento → acceso inicial → escalada, paso a paso |
-| 🧱 **Estructura reproducible** | Plantilla única y script que arma cada máquina nueva |
-| 🧪 **Labs propios** | Máquinas vulnerables que construyo yo mismo en Docker, con informe y guía — ver [`02-labs/`](02-labs/) |
+| Característica                 | Detalle                                                                                                |
+| :----------------------------- | :----------------------------------------------------------------------------------------------------- |
+| 🧾 **Formato profesional**     | Resumen ejecutivo para no técnicos + detalle técnico para el equipo                                    |
+| 🔎 **Evidencia real**          | Salidas de herramientas, capturas y _loot_ guardados junto a cada informe                              |
+| 🧮 **Hallazgos clasificados**  | Severidad, CVSS y recomendación de mitigación por cada vulnerabilidad                                  |
+| 🗺️ **Narrativa del ataque**    | Reconocimiento → acceso inicial → escalada, paso a paso                                                |
+| 🧱 **Estructura reproducible** | Plantilla única y script que arma cada máquina nueva                                                   |
+| 🧪 **Labs propios**            | Máquinas vulnerables que construyo yo mismo en Docker, con informe y guía — ver [`02-labs/`](02-labs/) |
 
 </div>
 
@@ -114,14 +114,14 @@ Este repositorio es mi <b>bitácora de práctica ofensiva en Hack The Box</b>. N
 
 <div align="center">
 
-| ID | Máquina | Dificultad | Técnica clave | Riesgo |
-|:--:|:-------:|:----------:|:--------------|:------:|
-| `HO-0001` | [Meow](00-starting-point/tier-0/00-meow/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Telnet con credenciales por defecto | 🔴 Crítico |
-| `HO-0002` | [Fawn](00-starting-point/tier-0/01-fawn/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | FTP con login anónimo | 🟠 Alto |
-| `HO-0003` | [Redeemer](00-starting-point/tier-0/03-redeemer/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Redis sin autenticación | 🔴 Crítico |
+|    ID     |                             Máquina                              |                               Dificultad                               | Técnica clave                          |   Riesgo   |
+| :-------: | :--------------------------------------------------------------: | :--------------------------------------------------------------------: | :------------------------------------- | :--------: |
+| `HO-0001` |        [Meow](00-starting-point/tier-0/00-meow/README.md)        | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Telnet con credenciales por defecto    | 🔴 Crítico |
+| `HO-0002` |        [Fawn](00-starting-point/tier-0/01-fawn/README.md)        | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | FTP con login anónimo                  |  🟠 Alto   |
+| `HO-0003` |    [Redeemer](00-starting-point/tier-0/03-redeemer/README.md)    | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Redis sin autenticación                | 🔴 Crítico |
 | `HO-0004` | [Preignition](00-starting-point/tier-0/05-preignition/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Panel web con credenciales por defecto | 🔴 Crítico |
-| `HO-0005` | [Mongod](00-starting-point/tier-0/06-mongod/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | MongoDB sin autenticación | 🔴 Crítico |
-| `HO-0006` | [Synced](00-starting-point/tier-0/07-synced/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Rsync sin autenticación | 🟠 Alto |
+| `HO-0005` |      [Mongod](00-starting-point/tier-0/06-mongod/README.md)      | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | MongoDB sin autenticación              | 🔴 Crítico |
+| `HO-0006` |      [Synced](00-starting-point/tier-0/07-synced/README.md)      | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Rsync sin autenticación                |  🟠 Alto   |
 
 </div>
 
@@ -129,8 +129,8 @@ Este repositorio es mi <b>bitácora de práctica ofensiva en Hack The Box</b>. N
 
 <div align="center">
 
-| ID | Máquina | Dificultad | Técnica clave | Riesgo |
-|:--:|:-------:|:----------:|:--------------|:------:|
+|    ID     |                      Máquina                       |                               Dificultad                               | Técnica clave                                                                                  |   Riesgo   |
+| :-------: | :------------------------------------------------: | :--------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------- | :--------: |
 | `HO-0011` | [Base](00-starting-point/tier-2/06-base/README.md) | ![](https://img.shields.io/badge/Very%20Easy-9FEF00?style=flat-square) | Type Juggling (bypass de login) → webshell (RCE) → reutilización de credenciales → `sudo find` | 🔴 Crítico |
 
 </div>
@@ -145,15 +145,15 @@ Este repositorio es mi <b>bitácora de práctica ofensiva en Hack The Box</b>. N
 
 <div align="center">
 
-| ID | Máquina | Dificultad | Técnica clave | Riesgo |
-|:--:|:-------:|:----------:|:--------------|:------:|
-| `HO-0007` | [Cap](01-machines/01-easy/00-cap/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | IDOR → PCAP con credenciales FTP → *Linux capabilities* | 🔴 Crítico |
-| `HO-0008` | [FriendZone](01-machines/01-easy/01-frienzone/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Transferencia de zona DNS → SMB → LFI → *module hijacking* | 🔴 Crítico |
-| `HO-0009` | [Inject](01-machines/01-easy/02-inject/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | LFI → Spring Cloud Function RCE → Ansible privesc | 🔴 Crítico |
-| `HO-0010` | [Shocker](01-machines/01-easy/03-shocker/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Shellshock en `cgi-bin` → `sudo` mal configurado | 🔴 Crítico |
-| `HO-0012` | [Bounty Hunter](01-machines/01-easy/04-bounty-hunter/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | XXE → lectura de archivos → reutilización de credenciales → inyección en `eval()` vía `sudo` | 🟠 Alto |
-| `HO-0016` | [Traverxec](01-machines/01-easy/05-traverxec/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | RCE en Nostromo 1.9.6 (CVE-2019-16278) → clave SSH en backup accesible → `sudo journalctl` + `less` (GTFOBins) | 🔴 Crítico |
-| `HO-0017` | [Valentine](01-machines/01-easy/06-valentine/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Heartbleed (CVE-2014-0160) → contraseña en memoria + clave SSH en directorio web → socket de `tmux` como root | 🟠 Alto |
+|    ID     |                             Máquina                             |                           Dificultad                            | Técnica clave                                                                                                  |   Riesgo   |
+| :-------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------- | :--------: |
+| `HO-0007` |           [Cap](01-machines/01-easy/00-cap/README.md)           | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | IDOR → PCAP con credenciales FTP → _Linux capabilities_                                                        | 🔴 Crítico |
+| `HO-0008` |    [FriendZone](01-machines/01-easy/01-frienzone/README.md)     | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Transferencia de zona DNS → SMB → LFI → _module hijacking_                                                     | 🔴 Crítico |
+| `HO-0009` |        [Inject](01-machines/01-easy/02-inject/README.md)        | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | LFI → Spring Cloud Function RCE → Ansible privesc                                                              | 🔴 Crítico |
+| `HO-0010` |       [Shocker](01-machines/01-easy/03-shocker/README.md)       | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Shellshock en `cgi-bin` → `sudo` mal configurado                                                               | 🔴 Crítico |
+| `HO-0012` | [Bounty Hunter](01-machines/01-easy/04-bounty-hunter/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | XXE → lectura de archivos → reutilización de credenciales → inyección en `eval()` vía `sudo`                   |  🟠 Alto   |
+| `HO-0016` |     [Traverxec](01-machines/01-easy/05-traverxec/README.md)     | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | RCE en Nostromo 1.9.6 (CVE-2019-16278) → clave SSH en backup accesible → `sudo journalctl` + `less` (GTFOBins) | 🔴 Crítico |
+| `HO-0017` |     [Valentine](01-machines/01-easy/06-valentine/README.md)     | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Heartbleed (CVE-2014-0160) → contraseña en memoria + clave SSH en directorio web → socket de `tmux` como root  |  🟠 Alto   |
 
 </div>
 
@@ -171,10 +171,10 @@ Laboratorios <b>que construyo yo mismo</b>, estilo HTB, para correr en local con
 
 <div align="center">
 
-| ID | Lab | Dificultad | Técnica clave | Riesgo |
-|:--:|:---:|:----------:|:--------------|:------:|
-| `HO-0013` | [Backstage](02-labs/backstage/informe.md) | ![](https://img.shields.io/badge/Easy-A78BFA?style=flat-square) | `.htpasswd` filtrado → crack offline (`john`) → SSH → `sudo find` (GTFOBins) | 🟠 Alto |
-| `HO-0014` | [Foundry](02-labs/foundry/informe.md) | ![](https://img.shields.io/badge/Easy-A78BFA?style=flat-square) | *Autoindex* en nginx → clave SSH en artefacto de build → `cap_setuid` en Python | 🔴 Crítico |
+|    ID     |                      Lab                      |                           Dificultad                            | Técnica clave                                                                                                     |   Riesgo   |
+| :-------: | :-------------------------------------------: | :-------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------- | :--------: |
+| `HO-0013` |   [Backstage](02-labs/backstage/informe.md)   | ![](https://img.shields.io/badge/Easy-A78BFA?style=flat-square) | `.htpasswd` filtrado → crack offline (`john`) → SSH → `sudo find` (GTFOBins)                                      |  🟠 Alto   |
+| `HO-0014` |     [Foundry](02-labs/foundry/informe.md)     | ![](https://img.shields.io/badge/Easy-A78BFA?style=flat-square) | _Autoindex_ en nginx → clave SSH en artefacto de build → `cap_setuid` en Python                                   | 🔴 Crítico |
 | `HO-0015` | [Switchboard](02-labs/switchboard/informe.md) | ![](https://img.shields.io/badge/Easy-A78BFA?style=flat-square) | `.git/` expuesto en el webroot (`git-dumper`) → credencial en el historial → SSH → grupo `shadow` → crack offline | 🔴 Crítico |
 
 </div>
@@ -197,8 +197,8 @@ Laboratorios <b>que construyo yo mismo</b>, estilo HTB, para correr en local con
 <div align="center">
 
 | Informes | Hallazgos totales | 🔴 Críticos | 🟠 Altos | 🟡 Medios | 🔵 Bajos | ⚪ Informativos |
-|:--------:|:-----------------:|:----------:|:-------:|:--------:|:-------:|:--------------:|
-| **17** | **46** | **12** | **22** | **10** | **1** | **1** |
+| :------: | :---------------: | :---------: | :------: | :-------: | :------: | :-------------: |
+|  **17**  |      **46**       |   **12**    |  **22**  |  **10**   |  **1**   |      **1**      |
 
 </div>
 
@@ -207,14 +207,14 @@ Laboratorios <b>que construyo yo mismo</b>, estilo HTB, para correr en local con
 
 <br/>
 
-| Patrón | Dónde aparece |
-|:-------|:--------------|
-| **Servicio expuesto sin autenticación** | Fawn, Redeemer, Mongod, Synced |
-| **Credenciales por defecto o débiles** | Meow, Preignition, Base, Bounty Hunter, Backstage |
-| **Crackeo offline de credenciales** (`john`/`hashcat`) | Backstage, Foundry, Switchboard, Traverxec |
-| **Ejecución de código remoto (RCE)** | Inject, Shocker, FriendZone, Base, Traverxec |
-| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Traverxec, Valentine |
-| **Divulgación de información / LFI / XXE** | Cap, FriendZone, Inject, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Valentine |
+| Patrón                                                 | Dónde aparece                                                                                                |
+| :----------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **Servicio expuesto sin autenticación**                | Fawn, Redeemer, Mongod, Synced                                                                               |
+| **Credenciales por defecto o débiles**                 | Meow, Preignition, Base, Bounty Hunter, Backstage                                                            |
+| **Crackeo offline de credenciales** (`john`/`hashcat`) | Backstage, Foundry, Switchboard, Traverxec                                                                   |
+| **Ejecución de código remoto (RCE)**                   | Inject, Shocker, FriendZone, Base, Traverxec                                                                 |
+| **Escalada de privilegios por mala configuración**     | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Traverxec, Valentine |
+| **Divulgación de información / LFI / XXE**             | Cap, FriendZone, Inject, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Valentine                     |
 
 </details>
 
@@ -276,14 +276,14 @@ flowchart LR
     class C,D,E ataque
 ```
 
-| Sección | Qué contiene |
-|:-------:|:-------------|
-| **Resumen ejecutivo** | Resultado en lenguaje claro, nivel de riesgo global y distribución de hallazgos |
-| **Alcance y metodología** | Objetivo, tipo de prueba (caja negra) y herramientas |
-| **Narrativa del ataque** | Reconocimiento, acceso inicial y escalada con evidencia |
-| **Hallazgos técnicos** | Descripción, impacto, CVSS y remediación de cada vulnerabilidad |
-| **Post-explotación** | Estado final del sistema y cómo se obtuvo cada flag |
-| **Conclusiones y anexos** | Recomendaciones generales, comandos y referencias |
+|          Sección          | Qué contiene                                                                    |
+| :-----------------------: | :------------------------------------------------------------------------------ |
+|   **Resumen ejecutivo**   | Resultado en lenguaje claro, nivel de riesgo global y distribución de hallazgos |
+| **Alcance y metodología** | Objetivo, tipo de prueba (caja negra) y herramientas                            |
+| **Narrativa del ataque**  | Reconocimiento, acceso inicial y escalada con evidencia                         |
+|  **Hallazgos técnicos**   | Descripción, impacto, CVSS y remediación de cada vulnerabilidad                 |
+|   **Post-explotación**    | Estado final del sistema y cómo se obtuvo cada flag                             |
+| **Conclusiones y anexos** | Recomendaciones generales, comandos y referencias                               |
 
 </div>
 
@@ -355,7 +355,7 @@ Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts
 
 <div align="center">
 
-Hecho con 🛡️ y muchas horas de terminal por [**Francisco Nieto · @NiettoFrann**](https://github.com/NiettoFrann)
+Hecho con muchas horas de terminal por [**Francisco Nieto · @NiettoFrann**](https://github.com/NiettoFrann)
 
 <img src="https://img.shields.io/badge/aprender%20atacando-para%20aprender%20a%20defender-9FEF00?style=flat-square&labelColor=0F172A" alt="Aprender atacando, para aprender a defender"/>
 
