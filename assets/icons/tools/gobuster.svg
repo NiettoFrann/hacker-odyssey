@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Gobuster">
+  <rect x="2" y="2" width="92" height="92" rx="22" fill="#0F172A" stroke="#00ADD8" stroke-opacity="0.55" stroke-width="2"/>
+  <g fill="none" stroke="#00ADD8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 30 C18 27 20 25 23 25 H37 L42 31 H67 C70 31 72 33 72 36 V44" />
+    <path d="M18 30 V66 C18 69 20 71 23 71 H46" fill="none"/>
+    <circle cx="62" cy="58" r="11" fill="#00ADD8" fill-opacity="0.12"/>
+    <path d="M70 66 L79 75"/>
+  </g>
+  <text x="62" y="63" fill="#00ADD8" font-family="'JetBrains Mono', Consolas, monospace" font-size="15" font-weight="800" text-anchor="middle">/</text>
+</svg>
