@@ -9,8 +9,8 @@
 <br>
 
 ![Hack The Box](https://img.shields.io/badge/Hack%20The%20Box-9FEF00?style=for-the-badge&logo=hackthebox&logoColor=black)
-![Informes](https://img.shields.io/badge/informes-16-blue?style=for-the-badge)
-![Hallazgos](https://img.shields.io/badge/hallazgos-43-red?style=for-the-badge)
+![Informes](https://img.shields.io/badge/informes-17-blue?style=for-the-badge)
+![Hallazgos](https://img.shields.io/badge/hallazgos-46-red?style=for-the-badge)
 ![Idioma](https://img.shields.io/badge/idioma-espa%C3%B1ol-orange?style=for-the-badge)
 ![Markdown](https://img.shields.io/badge/formato-Markdown-lightgrey?style=for-the-badge&logo=markdown&logoColor=black)
 
@@ -81,6 +81,7 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 | `HO-0010` | [Shocker](01-machines/01-easy/03-shocker/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | Shellshock en `cgi-bin` → `sudo` mal configurado | 🔴 Crítico |
 | `HO-0012` | [Bounty Hunter](01-machines/01-easy/04-bounty-hunter/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | XXE → lectura de archivos → reutilización de credenciales → inyección en `eval()` vía `sudo` | 🟠 Alto |
 | `HO-0016` | [Traverxec](01-machines/01-easy/05-traverxec/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | RCE en Nostromo 1.9.6 (CVE-2019-16278) → clave SSH en backup accesible → `sudo journalctl` + `less` (GTFOBins) | 🔴 Crítico |
+| `HO-0017` | [Valentine](01-machines/01-easy/06-valentine/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | Heartbleed (CVE-2014-0160) → contraseña en memoria + clave SSH en directorio web → socket de `tmux` como root | 🟠 Alto |
 
 ### 🧪 Labs propios
 
@@ -108,13 +109,13 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 
 | Informes | Hallazgos totales | 🔴 Críticos | 🟠 Altos | 🟡 Medios | 🔵 Bajos | ⚪ Informativos |
 |:--------:|:-----------------:|:----------:|:-------:|:--------:|:-------:|:--------------:|
-| **16** | **43** | **12** | **20** | **9** | **1** | **1** |
+| **17** | **46** | **12** | **22** | **10** | **1** | **1** |
 
 ```mermaid
 pie showData title Hallazgos por severidad
     "Crítica" : 12
-    "Alta" : 20
-    "Media" : 9
+    "Alta" : 22
+    "Media" : 10
     "Baja" : 1
     "Informativa" : 1
 ```
@@ -130,8 +131,8 @@ pie showData title Hallazgos por severidad
 | **Credenciales por defecto o débiles** | Meow, Preignition, Base, Bounty Hunter, Backstage |
 | **Crackeo offline de credenciales** (`john`/`hashcat`) | Backstage, Foundry, Switchboard, Traverxec |
 | **Ejecución de código remoto (RCE)** | Inject, Shocker, FriendZone, Base, Traverxec |
-| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Traverxec |
-| **Divulgación de información / LFI / XXE** | Cap, FriendZone, Inject, Base, Bounty Hunter, Backstage, Foundry, Switchboard |
+| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Traverxec, Valentine |
+| **Divulgación de información / LFI / XXE** | Cap, FriendZone, Inject, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Valentine |
 
 </details>
 
