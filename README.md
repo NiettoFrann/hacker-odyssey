@@ -294,11 +294,11 @@ flowchart LR
 **1. Crear la estructura de una máquina nueva**
 
 ```bash
-cd utils
-./new-machine.sh <ruta-maquina> <S.O> <dificultad> <IP>
+./utils/new-machine.sh <ruta-maquina> [S.O] [dificultad] [IP]
+./utils/new-machine.sh 01-machines/01-easy/sau Linux "" 10.10.11.224   # -> 01-easy/07-sau
 ```
 
-Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts/` y el directorio de capturas.
+Genera `README.md` desde la plantilla, junto con las carpetas `loot/`, `scripts/` e `img/`. Asigna automáticamente el ID `HO-XXXX` y el número de carpeta, y deduce la dificultad de la categoría si no se indica.
 
 **2. Documentar la evidencia** en `loot/` y `scripts/` mientras se trabaja la máquina.
 
