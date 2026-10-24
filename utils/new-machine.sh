@@ -115,7 +115,7 @@ sed -e "s|NombreMaquina|$(esc "$DISPLAY_NAME")|g" \
     ${AUTHOR:+-e "s|^\| \*\*Autor\*\* \| Francisco Nieto|\| **Autor** \| $(esc "$AUTHOR")|"} \
     "$TEMPLATE" > "$TARGET_DIR/README.md"
 
-touch "$TARGET_DIR/scripts/.gitkeep" "$TARGET_DIR/img/.gitkeep"
+touch "$TARGET_DIR/scripts/.gitkeep" "$TARGET_DIR/loot/.gitkeep" "$TARGET_DIR/img/.gitkeep"
 
 echo "Listo: $TARGET_DIR"
 echo "  - README.md generado desde el template (HO-$REPORT_NUM-00)"
