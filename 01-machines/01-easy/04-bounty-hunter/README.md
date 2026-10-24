@@ -5,7 +5,7 @@ platform: Hack The Box
 os: Linux
 difficulty: Easy
 ip: 10.129.95.166
-date: 2026-10-22
+date: 2026-10-23
 version: 1.0
 author: Francisco Nieto
 status: Final
@@ -21,7 +21,7 @@ tags:
 | **Objetivo**           | Bounty Hunter (`10.129.95.166`)                                  |
 | **Plataforma**         | Hack The Box — máquina retirada                                  |
 | **Tipo de prueba**     | Caja negra (black box)                                           |
-| **Fecha de ejecución** | 2026-10-22                                                       |
+| **Fecha de ejecución** | 2026-10-23                                                       |
 | **Autor**              | Francisco Nieto — [@NiettoFrann](https://github.com/NiettoFrann) |
 | **Versión**            | 1.0                                                              |
 | **Clasificación**      | Público — uso educativo                                          |
@@ -34,7 +34,7 @@ tags:
 
 | Versión | Fecha      | Descripción     |
 | ------- | ---------- | --------------- |
-| 1.0     | 2026-10-22 | Versión inicial |
+| 1.0     | 2026-10-23 | Versión inicial |
 
 ---
 
