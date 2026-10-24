@@ -117,6 +117,21 @@ sed -e "s|NombreMaquina|$(esc "$DISPLAY_NAME")|g" \
 
 touch "$TARGET_DIR/scripts/.gitkeep" "$TARGET_DIR/loot/.gitkeep" "$TARGET_DIR/img/.gitkeep"
 
-echo "Listo: $TARGET_DIR"
-echo "  - README.md generado desde el template (HO-$REPORT_NUM-00)"
+echo "Listo: $MACHINE_PATH"
+echo "  - README.md generado desde el template (HO-$REPORT_NUM-00, $DIFFICULTY)"
 echo "  - scripts/, loot/ e img/ listos para usar"
+
+# main está protegida: todo entra por rama + PR (ver CLAUDE.md)
+SLUG="${MACHINE_NAME#*-}"
+CURRENT_BRANCH="$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || true)"
+echo
+echo "Próximos pasos:"
+if [ "$CURRENT_BRANCH" = "main" ]; then
+  echo "  1. git switch -c docs/$SLUG-report    # estás en main, que está protegida"
+else
+  echo "  1. Trabajar en una rama (actual: ${CURRENT_BRANCH:-?}), por ejemplo docs/$SLUG-report"
+fi
+echo "  2. Guardar la evidencia en loot/ y scripts/, y las capturas en img/"
+echo "  3. Redactar el informe con la skill informe-pentest"
+echo "  4. Indexar el informe en el README raíz (tabla, estadísticas y SVG)"
+echo "  5. gh pr create  ->  gh pr merge --squash"
