@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="320" viewBox="0 0 1000 320" role="img" aria-labelledby="t d">
+  <title id="t">Hallazgos por severidad</title>
+  <desc id="d">46 hallazgos en 17 informes: 12 críticos, 22 altos, 10 medios, 1 bajo y 1 informativo.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A0F1A"/>
+      <stop offset="1" stop-color="#141D2B"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D4FF5A"/>
+      <stop offset="1" stop-color="#6EDC00"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="320" rx="16" fill="url(#bg)"/>
+
+  <g font-family="'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif">
+    <!-- panel de totales -->
+    <rect x="32" y="32" width="268" height="256" rx="14" fill="#0F172A" stroke="#9FEF00" stroke-opacity="0.3"/>
+    <text x="60" y="76" fill="#94A3B8" font-size="12" font-weight="800" letter-spacing="3">HALLAZGOS</text>
+    <text x="56" y="160" fill="url(#green)" font-size="84" font-weight="800" letter-spacing="-2">46</text>
+    <text x="60" y="194" fill="#CBD5E1" font-size="16">en <tspan fill="#F8FAFC" font-weight="700">17 informes</tspan></text>
+    <line x1="60" y1="218" x2="272" y2="218" stroke="#1E293B" stroke-width="2"/>
+    <text x="60" y="246" fill="#94A3B8" font-size="13">Crítico + Alto</text>
+    <text x="272" y="246" fill="#F8FAFC" font-size="13" font-weight="700" text-anchor="end">34 · 74%</text>
+    <text x="60" y="268" fill="#94A3B8" font-size="13">Riesgo predominante</text>
+    <text x="272" y="268" fill="#F8FAFC" font-size="13" font-weight="700" text-anchor="end">Alto</text>
+
+    <!-- barras: escala 22 → 380px -->
+    <text x="340" y="62" fill="#F8FAFC" font-size="18" font-weight="800">Hallazgos por severidad</text>
+
+    <g font-size="14">
+      <!-- Crítica 12 -->
+      <text x="340" y="105" fill="#E2E8F0" font-weight="600">Crítica</text>
+      <rect x="470" y="93" width="380" height="16" rx="4" fill="#1E293B" fill-opacity="0.6"/>
+      <rect x="470" y="93" width="207" height="16" rx="4" fill="#E5484D"/>
+      <text x="689" y="106" fill="#F8FAFC" font-weight="700">12 <tspan fill="#94A3B8" font-weight="400" font-size="12">· 26%</tspan></text>
+
+      <!-- Alta 22 -->
+      <text x="340" y="147" fill="#E2E8F0" font-weight="600">Alta</text>
+      <rect x="470" y="135" width="380" height="16" rx="4" fill="#1E293B" fill-opacity="0.6"/>
+      <rect x="470" y="135" width="380" height="16" rx="4" fill="#F59E0B"/>
+      <text x="862" y="148" fill="#F8FAFC" font-weight="700">22 <tspan fill="#94A3B8" font-weight="400" font-size="12">· 48%</tspan></text>
+
+      <!-- Media 10 -->
+      <text x="340" y="189" fill="#E2E8F0" font-weight="600">Media</text>
+      <rect x="470" y="177" width="380" height="16" rx="4" fill="#1E293B" fill-opacity="0.6"/>
+      <rect x="470" y="177" width="173" height="16" rx="4" fill="#FDE047"/>
+      <text x="655" y="190" fill="#F8FAFC" font-weight="700">10 <tspan fill="#94A3B8" font-weight="400" font-size="12">· 22%</tspan></text>
+
+      <!-- Baja 1 -->
+      <text x="340" y="231" fill="#E2E8F0" font-weight="600">Baja</text>
+      <rect x="470" y="219" width="380" height="16" rx="4" fill="#1E293B" fill-opacity="0.6"/>
+      <rect x="470" y="219" width="17" height="16" rx="4" fill="#38BDF8"/>
+      <text x="499" y="232" fill="#F8FAFC" font-weight="700">1 <tspan fill="#94A3B8" font-weight="400" font-size="12">· 2%</tspan></text>
+
+      <!-- Informativa 1 -->
+      <text x="340" y="273" fill="#E2E8F0" font-weight="600">Informativa</text>
+      <rect x="470" y="261" width="380" height="16" rx="4" fill="#1E293B" fill-opacity="0.6"/>
+      <rect x="470" y="261" width="17" height="16" rx="4" fill="#CBD5E1"/>
+      <text x="499" y="274" fill="#F8FAFC" font-weight="700">1 <tspan fill="#94A3B8" font-weight="400" font-size="12">· 2%</tspan></text>
+    </g>
+  </g>
+</svg>
