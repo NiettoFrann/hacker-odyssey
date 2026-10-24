@@ -1,0 +1,10 @@
+services:
+  switchboard:
+    build: .
+    image: hacker-odyssey/switchboard:latest
+    container_name: switchboard
+    hostname: switchboard
+    ports:
+      - "8082:80"    # http  ->  http://127.0.0.1:8082
+      - "2224:22"    # ssh   ->  ssh ... -p 2224
+    restart: "no"
