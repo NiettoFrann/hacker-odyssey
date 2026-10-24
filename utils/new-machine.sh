@@ -53,7 +53,8 @@ if [ -f "$TARGET_DIR/README.md" ]; then
 fi
 
 # Próximo número de informe: el mayor report_id HO-NNNN-00 del repo + 1
-LAST_ID="$(grep -rhoE --include=README.md '^report_id: HO-[0-9]{4}' "$REPO_ROOT" 2>/dev/null \
+# (las máquinas usan README.md y los labs informe.md)
+LAST_ID="$(grep -rhoE --include=README.md --include=informe.md '^report_id: HO-[0-9]{4}' "$REPO_ROOT" 2>/dev/null \
   | grep -oE '[0-9]{4}$' | sort -n | tail -1 || true)"
 REPORT_NUM="$(printf '%04d' $((10#${LAST_ID:-0} + 1)))"
 
