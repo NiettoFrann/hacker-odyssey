@@ -23,6 +23,7 @@ detallada (con ejemplos) sobre enumeración web, Basic Auth / `.htpasswd`, crack
 | Lab | SO | Dificultad | Cadena | Escalada |
 |:----|:--:|:----------:|:-------|:---------|
 | [🎭 backstage](backstage/) | Linux | Fácil | enum config web → `.htpasswd` filtrado → crack `john` → SSH | `sudo` (GTFOBin `find`) |
+| [🏭 foundry](foundry/) | Linux | Fácil | enum web (nginx) → `.zip` publicado → crack del ZIP → clave SSH | **capabilities** (`cap_setuid` en python) |
 
 ## Uso general
 
