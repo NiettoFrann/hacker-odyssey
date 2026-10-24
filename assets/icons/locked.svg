@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Pendiente">
+  <rect x="2" y="2" width="92" height="92" rx="22" fill="#0F172A" stroke="#64748B" stroke-opacity="0.55" stroke-width="2"/>
+  <g fill="none" stroke="#64748B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M36 44 V34 C36 26 42 22 48 22 C54 22 60 26 60 34 V44"/>
+    <rect x="26" y="44" width="44" height="32" rx="6" fill="#64748B" fill-opacity="0.15"/>
+    <path d="M48 58 V64"/>
+  </g>
+  <circle cx="48" cy="57" r="4" fill="#64748B"/>
+</svg>
