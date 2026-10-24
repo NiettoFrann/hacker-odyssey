@@ -56,13 +56,31 @@ de la evidencia de `loot/`, `scripts/` y notas. Reglas clave:
 - Flags y credenciales **parcialmente censuradas** en el informe.
 - Español neutro y profesional; resumen ejecutivo sin tecnicismos.
 
-### Checklist después de publicar un informe
+### Regla: actualizar el README principal después de cada informe
 
-- [ ] Fila nueva en la tabla de **Informes** del `README.md` raíz con su `HO-XXXX`.
-- [ ] Badges de informes/hallazgos y tabla de **Estadísticas** actualizados.
-- [ ] `assets/diagrams/severidad.svg` (totales, barras, porcentajes).
-- [ ] `assets/diagrams/roadmap.svg` (progreso de la categoría).
-- [ ] En labs: fila en la tabla de `02-labs/README.md`.
+Un informe **no está terminado** hasta que el `README.md` raíz lo refleja. Después de crear
+el informe de una máquina o lab, actualizar el README **sin esperar a que se pida**, en la
+misma rama y el mismo PR que el informe, en commits propios:
+`docs(readme): index <Machine> and bump counters` y `docs(assets): update severity chart and roadmap`.
+
+Qué tocar en el `README.md` raíz:
+
+1. **Tabla de su categoría** en *📚 Informes* (Starting Point → su Tier, *Machines — <Dificultad>*
+   o *Labs propios*): fila nueva ordenada por ID con `HO-XXXX`, link al informe, badge de
+   dificultad (mismo color que las filas vecinas), técnica clave como cadena con `→` y riesgo
+   (= nivel de riesgo global del informe: 🔴 Crítico, 🟠 Alto, 🟡 Medio, 🔵 Bajo). Si es la
+   primera máquina de una dificultad, crear la sección copiando la estructura de *Easy*.
+2. **Badges del encabezado:** `informes-N` y `hallazgos-N`.
+3. **Tabla de *Estadísticas*:** total de informes y hallazgos por severidad, sumando la
+   tabla *1.3 Distribución de hallazgos* del informe nuevo.
+4. ***Vulnerabilidades que más se repiten*:** agregar la máquina a los patrones que aplique.
+5. ***Ruta de entrenamiento*:** estado de la categoría si cambia (pendiente → en curso…).
+6. **SVG:** `assets/diagrams/severidad.svg` (totales, barras, porcentajes) y
+   `assets/diagrams/roadmap.svg` (progreso de la categoría).
+7. **Labs:** además, fila en la tabla de `02-labs/README.md`.
+
+Antes de commitear, verificar que cuadren los números: el badge de informes = filas de las
+tablas, el de hallazgos = suma de la tabla de estadísticas = total del SVG.
 
 ## Flujo de trabajo con git
 
@@ -80,6 +98,7 @@ git push -u origin docs/valentine-report
 gh pr create --fill          # o con título/cuerpo explícitos
 gh pr merge --squash         # tras revisar el diff en el PR
 git switch main && git pull
+# tag + release si corresponde (ver "Tags y releases")
 ```
 
 ### Ramas
@@ -165,21 +184,35 @@ tipo/scope y un footer `BREAKING CHANGE: <descripción>`.
 
 ### Tags y releases
 
-Tags **anotados** con [SemVer](https://semver.org/) `vMAJOR.MINOR.PATCH`, creados sobre
-`main` después de mergear:
+El repo se versiona como producto con [SemVer](https://semver.org/): tags **anotados**
+`vMAJOR.MINOR.PATCH`, siempre sobre `main` **después de mergear** el PR, nunca sobre una rama.
 
-- **MAJOR:** reestructuración del repo o cambio incompatible del formato de informe.
-- **MINOR:** informe(s) o lab(s) nuevos.
-- **PATCH:** correcciones (datos, links, typos, assets).
+| Bump | Cuándo | Ejemplo |
+|------|--------|---------|
+| **MAJOR** | Reestructuración de carpetas, cambio incompatible de la plantilla o de los IDs `HO-` | `v2.0.0` |
+| **MINOR** | Informe o lab nuevo; funcionalidad nueva en `utils/` o en la skill | `v1.1.0` |
+| **PATCH** | Correcciones de datos, links, typos, assets o formato | `v1.0.1` |
+
+- Se crea un tag al mergear cada PR que cambie el contenido. Si se mergean varios PR seguidos,
+  un solo tag con el bump más alto. Los cambios solo internos (`CLAUDE.md`, CI) no necesitan
+  tag propio: entran en el siguiente.
+- Cada tag lleva su **release** en GitHub, con las notas generadas a partir de los PR.
+- Mensaje del tag y título de la release en inglés: `Add Sau report`, `v1.1.0 — Sau`.
+- Los tags `v*` están protegidos por el ruleset **"Proteger tags de versión"**: no se pueden
+  borrar ni mover. Si un tag sale mal, se corrige con un PATCH nuevo, nunca reetiquetando.
+- Después de mergear un PR, Claude propone el bump que corresponde y crea el tag y la release
+  si se le confirma.
 
 ```bash
 git switch main && git pull
-git tag -a v1.4.0 -m "Add Valentine report"
-git push origin v1.4.0
-gh release create v1.4.0 --generate-notes   # opcional
+git describe --tags --abbrev=0                 # último tag
+git tag -a v1.1.0 -m "Add Sau report"
+git push origin v1.1.0
+gh release create v1.1.0 --title "v1.1.0 — Sau" --generate-notes
 ```
 
-El mensaje del tag va en inglés, en imperativo y breve.
+Historial: `v1.0.0` es la línea base (17 informes, 3 labs y README rediseñado), creada sobre
+el `main` del 2026-10-24, antes de adoptar este flujo.
 
 ## CI
 
