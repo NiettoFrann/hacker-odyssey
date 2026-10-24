@@ -9,14 +9,15 @@
 <br>
 
 ![Hack The Box](https://img.shields.io/badge/Hack%20The%20Box-9FEF00?style=for-the-badge&logo=hackthebox&logoColor=black)
-![Informes](https://img.shields.io/badge/informes-11-blue?style=for-the-badge)
-![Hallazgos](https://img.shields.io/badge/hallazgos-29-red?style=for-the-badge)
+![Informes](https://img.shields.io/badge/informes-14-blue?style=for-the-badge)
+![Hallazgos](https://img.shields.io/badge/hallazgos-38-red?style=for-the-badge)
 ![Idioma](https://img.shields.io/badge/idioma-espa%C3%B1ol-orange?style=for-the-badge)
 ![Markdown](https://img.shields.io/badge/formato-Markdown-lightgrey?style=for-the-badge&logo=markdown&logoColor=black)
 
 <br>
 
 [**Informes**](#-informes) ·
+[**Labs propios**](#-labs-propios) ·
 [**Estadísticas**](#-estadísticas) ·
 [**Estructura**](#-estructura-del-repositorio) ·
 [**Flujo de trabajo**](#-flujo-de-trabajo) ·
@@ -43,6 +44,7 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 | 🧮 **Hallazgos clasificados** | Severidad, CVSS y recomendación de mitigación por cada vulnerabilidad |
 | 🗺️ **Narrativa del ataque** | Reconocimiento → acceso inicial → escalada, paso a paso |
 | 🧱 **Estructura reproducible** | Plantilla única y script que arma cada máquina nueva |
+| 🧪 **Labs propios** | Máquinas vulnerables que construyo yo mismo en Docker, con informe y guía — ver [`02-labs/`](02-labs/) |
 
 </div>
 
@@ -77,12 +79,24 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 | `HO-0008` | [FriendZone](01-machines/01-easy/01-frienzone/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | Transferencia de zona DNS → SMB → LFI → *module hijacking* | 🔴 Crítico |
 | `HO-0009` | [Inject](01-machines/01-easy/02-inject/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | LFI → Spring Cloud Function RCE → Ansible privesc | 🔴 Crítico |
 | `HO-0010` | [Shocker](01-machines/01-easy/03-shocker/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | Shellshock en `cgi-bin` → `sudo` mal configurado | 🔴 Crítico |
+| `HO-0012` | [Bounty Hunter](01-machines/01-easy/04-bounty-hunter/README.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | XXE → lectura de archivos → reutilización de credenciales → inyección en `eval()` vía `sudo` | 🟠 Alto |
+
+### 🧪 Labs propios
+
+> Laboratorios **que construyo yo mismo**, estilo HTB, para correr en local con Docker.
+> Cada uno trae su `Dockerfile`, `docker-compose.yml`, informe y guía por pistas. Ver [`02-labs/`](02-labs/).
+
+| ID | Lab | Dificultad | Técnica clave | Riesgo |
+|:--:|:---:|:----------:|:--------------|:------:|
+| `HO-0013` | [Backstage](02-labs/backstage/informe.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | `.htpasswd` filtrado → crack offline (`john`) → SSH → `sudo find` (GTFOBins) | 🟠 Alto |
+| `HO-0014` | [Foundry](02-labs/foundry/informe.md) | ![](https://img.shields.io/badge/Easy-yellowgreen) | *Autoindex* en nginx → clave SSH en artefacto de build → `cap_setuid` en Python | 🔴 Crítico |
 
 </div>
 
 > [!NOTE]
 > Medium, Hard e Insane ya tienen su carpeta lista; se irán completando.
 > El Tier 1 y el resto del Tier 2 de Starting Point están creados y pendientes de documentar.
+> Más labs propios en camino.
 
 ---
 
@@ -92,13 +106,13 @@ como un **informe de prueba de penetración** con el formato que recibiría un c
 
 | Informes | Hallazgos totales | 🔴 Críticos | 🟠 Altos | 🟡 Medios | 🔵 Bajos | ⚪ Informativos |
 |:--------:|:-----------------:|:----------:|:-------:|:--------:|:-------:|:--------------:|
-| **11** | **29** | **9** | **11** | **7** | **1** | **1** |
+| **14** | **38** | **10** | **17** | **9** | **1** | **1** |
 
 ```mermaid
 pie showData title Hallazgos por severidad
-    "Crítica" : 9
-    "Alta" : 11
-    "Media" : 7
+    "Crítica" : 10
+    "Alta" : 17
+    "Media" : 9
     "Baja" : 1
     "Informativa" : 1
 ```
@@ -111,10 +125,11 @@ pie showData title Hallazgos por severidad
 | Patrón | Dónde aparece |
 |:-------|:--------------|
 | **Servicio expuesto sin autenticación** | Fawn, Redeemer, Mongod, Synced |
-| **Credenciales por defecto o débiles** | Meow, Preignition, Base |
+| **Credenciales por defecto o débiles** | Meow, Preignition, Base, Bounty Hunter, Backstage |
+| **Crackeo offline de credenciales** (`john`/`hashcat`) | Backstage, Foundry |
 | **Ejecución de código remoto (RCE)** | Inject, Shocker, FriendZone, Base |
-| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone, Base |
-| **Divulgación de información / LFI** | Cap, FriendZone, Inject, Base |
+| **Escalada de privilegios por mala configuración** | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry |
+| **Divulgación de información / LFI / XXE** | Cap, FriendZone, Inject, Base, Bounty Hunter, Backstage, Foundry |
 
 </details>
 
@@ -141,6 +156,11 @@ hacker-odyssey/
 │   ├── 02-medium/
 │   ├── 03-hard/
 │   └── 04-insane/
+├── 02-labs/                  # 🧪 Labs propios vulnerables (Docker)
+│   ├── teoria.md             # 📖 Guía de conceptos (sin spoilers)
+│   ├── backstage/            # Dockerfile + informe.md + guia.md
+│   ├── foundry/
+│   └── switchboard/
 ├── assets/
 │   └── images/screenshots/   # 📸 Capturas referenciadas en los informes
 ├── utils/
@@ -211,6 +231,9 @@ Genera `README.md` desde la plantilla, junto con las carpetas `loot/` y `scripts
 ![Burp Suite](https://img.shields.io/badge/Burp%20Suite-FF6633?style=flat-square&logo=burpsuite&logoColor=white)
 ![Wireshark](https://img.shields.io/badge/Wireshark-1679A7?style=flat-square&logo=wireshark&logoColor=white)
 ![pspy](https://img.shields.io/badge/pspy-444?style=flat-square)
+![John the Ripper](https://img.shields.io/badge/John%20the%20Ripper-8B0000?style=flat-square)
+![Hashcat](https://img.shields.io/badge/Hashcat-E03C31?style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
 ![Bash](https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnubash&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
 
