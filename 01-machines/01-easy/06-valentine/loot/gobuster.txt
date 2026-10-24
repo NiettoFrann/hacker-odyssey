@@ -1,0 +1,33 @@
+gobuster dir -u http://10.129.232.136 -w /usr/share/seclists/Discovery/Web-Content/common.txt --add-slash
+===============================================================
+Gobuster v3.8.2
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://10.129.232.136
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/common.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.8.2
+[+] Add Slash:               true
+[+] Timeout:                 10s
+===============================================================
+Starting gobuster in directory enumeration mode
+===============================================================
+.htaccess/           (Status: 403) [Size: 292]
+.hta/                (Status: 403) [Size: 287]
+.htpasswd/           (Status: 403) [Size: 292]
+cgi-bin/             (Status: 403) [Size: 290]
+cgi-bin//            (Status: 403) [Size: 291]
+decode/              (Status: 200) [Size: 552]
+dev/                 (Status: 200) [Size: 1100]
+doc/                 (Status: 403) [Size: 286]
+encode/              (Status: 200) [Size: 554]
+icons/               (Status: 403) [Size: 288]
+index/               (Status: 200) [Size: 38]
+index.php/           (Status: 200) [Size: 38]
+server-status/       (Status: 403) [Size: 296]
+Progress: 4751 / 4751 (100.00%)
+===============================================================
+Finished
+===============================================================
