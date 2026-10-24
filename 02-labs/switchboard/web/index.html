@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Switchboard · Panel de operaciones</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family:system-ui,sans-serif; background:#0d1117; color:#c9d1d9; }
+    header { padding:48px 24px; text-align:center; border-bottom:1px solid #21262d; }
+    h1 { margin:0; font-size:2.4rem; color:#58d6ff; }
+    main { max-width:720px; margin:0 auto; padding:32px 24px; line-height:1.6; }
+    .card { background:#161b22; border:1px solid #21262d; border-radius:10px; padding:20px; margin:16px 0; }
+    code { background:#21262d; padding:2px 6px; border-radius:4px; }
+    footer { text-align:center; color:#484f58; padding:24px; font-size:.85rem; }
+    a { color:#58a6ff; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Switchboard</h1>
+    <p>Panel de operaciones &mdash; conmutador legacy</p>
+  </header>
+  <main>
+    <div class="card">
+      <h2>Estado de la central</h2>
+      <p>Enlaces activos: <code>42</code> &mdash; conmutación nominal.
+      El panel de edición está reservado al equipo de operaciones.</p>
+    </div>
+    <div class="card">
+      <h2>Despliegue</h2>
+      <p>El sitio se publica desde el repositorio del equipo mediante el
+      script de despliegue estándar.</p>
+      <p style="color:#8b949e"><em>Nota de operaciones: recordar que el versionado del
+      proyecto no debería viajar junto al contenido publicado. Revisar el último deploy.</em></p>
+    </div>
+  </main>
+  <footer>Switchboard &middot; operaciones internas</footer>
+</body>
+</html>
