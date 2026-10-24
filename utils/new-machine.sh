@@ -6,10 +6,11 @@
 #
 # La ruta es relativa a la raíz del repo (el padre de utils/) y se puede correr desde
 # cualquier directorio. Si el nombre no trae prefijo NN-, se le asigna el siguiente libre.
+# Si no se pasa la dificultad, se deduce de la carpeta (Starting Point -> "Very Easy").
 #
 # Ejemplos:
-#   ./utils/new-machine.sh 00-starting-point/tier-1/appointment Linux "Very Easy"
-#   ./utils/new-machine.sh 01-machines/01-easy/shocker Linux Easy 10.10.10.56
+#   ./utils/new-machine.sh 00-starting-point/tier-1/appointment
+#   ./utils/new-machine.sh 01-machines/01-easy/shocker Linux "" 10.10.10.56
 #
 # Variables opcionales:
 #   AUTHOR   nombre del autor (por defecto queda el del template)
@@ -25,11 +26,9 @@ fi
 MACHINE_PATH="${1#./}"
 MACHINE_PATH="${MACHINE_PATH%/}"
 OS="${2:-Linux}"
-DIFFICULTY="${3:-Easy}"
 IP="${4:-10.10.11.XXX}"
 TODAY="$(date +%Y-%m-%d)"
 OS_TAG="${OS,,}"
-DIFF_TAG="$(echo "${DIFFICULTY,,}" | tr ' ' '-')"
 AUTHOR="${AUTHOR:-}"
 
 # Este script vive en <repo>/utils; la raíz del repo es el directorio padre.
@@ -46,6 +45,16 @@ fi
 
 PARENT_PATH="$(dirname "$MACHINE_PATH")"
 MACHINE_NAME="$(basename "$MACHINE_PATH")"
+
+# Dificultad y tags por defecto según la categoría (el 3er argumento la pisa):
+# Starting Point -> "Very Easy" + tag starting-point; 01-machines/02-medium -> "Medium"
+EXTRA_TAGS=""
+case "$PARENT_PATH" in
+  00-starting-point/*) DEFAULT_DIFFICULTY="Very Easy"; EXTRA_TAGS=", starting-point" ;;
+  *)                   DEFAULT_DIFFICULTY="${PARENT_PATH##*/[0-9][0-9]-}" ;;
+esac
+DIFFICULTY="${3:-${DEFAULT_DIFFICULTY^}}"
+DIFF_TAG="$(echo "${DIFFICULTY,,}" | tr ' ' '-')"
 
 # Sin prefijo numérico: reutiliza la carpeta NN-nombre si ya existe (Starting Point tiene
 # placeholders) o le asigna el siguiente número libre de la categoría
@@ -101,7 +110,7 @@ sed -e "s|NombreMaquina|$(esc "$DISPLAY_NAME")|g" \
     -e "s|10\.10\.11\.XXX|$(esc "$IP")|g" \
     -e "s|^os: .*|os: $(esc "$OS")|" \
     -e "s|^difficulty: .*|difficulty: $(esc "$DIFFICULTY")|" \
-    -e "s|^tags: .*|tags: [htb, $(esc "$OS_TAG"), $(esc "$DIFF_TAG")]|" \
+    -e "s|^tags: .*|tags: [htb, $(esc "$OS_TAG"), $(esc "$DIFF_TAG")$EXTRA_TAGS]|" \
     ${AUTHOR:+-e "s|^author: .*|author: $(esc "$AUTHOR")|"} \
     ${AUTHOR:+-e "s|^\| \*\*Autor\*\* \| Francisco Nieto|\| **Autor** \| $(esc "$AUTHOR")|"} \
     "$TEMPLATE" > "$TARGET_DIR/README.md"
