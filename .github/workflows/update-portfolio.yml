@@ -4,7 +4,7 @@ name: Actualizar portfolio
 on:
   push:
     branches: [main]
-    paths: ['**/README.md']
+    paths: ['**/README.md', '**/informe.md']
   workflow_dispatch:
 
 jobs:
