@@ -5,8 +5,8 @@
 <br/>
 
 ![Hack The Box](https://img.shields.io/badge/Hack%20The%20Box-9FEF00?style=for-the-badge&logo=hackthebox&logoColor=black)
-![Informes](https://img.shields.io/badge/informes-17-38BDF8?style=for-the-badge&logo=bookstack&logoColor=white)
-![Hallazgos](https://img.shields.io/badge/hallazgos-46-E5484D?style=for-the-badge&logo=target&logoColor=white)
+![Informes](https://img.shields.io/badge/informes-18-38BDF8?style=for-the-badge&logo=bookstack&logoColor=white)
+![Hallazgos](https://img.shields.io/badge/hallazgos-50-E5484D?style=for-the-badge&logo=target&logoColor=white)
 ![Idioma](https://img.shields.io/badge/idioma-espa%C3%B1ol-A78BFA?style=for-the-badge&logo=googletranslate&logoColor=white)
 ![Markdown](https://img.shields.io/badge/formato-Markdown-0F172A?style=for-the-badge&logo=markdown&logoColor=white)
 
@@ -154,6 +154,7 @@ Este repositorio es mi <b>bitácora de práctica ofensiva en Hack The Box</b>. N
 | `HO-0012` | [Bounty Hunter](01-machines/01-easy/04-bounty-hunter/README.md) | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | XXE → lectura de archivos → reutilización de credenciales → inyección en `eval()` vía `sudo`                   |  🟠 Alto   |
 | `HO-0016` |     [Traverxec](01-machines/01-easy/05-traverxec/README.md)     | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | RCE en Nostromo 1.9.6 (CVE-2019-16278) → clave SSH en backup accesible → `sudo journalctl` + `less` (GTFOBins) | 🔴 Crítico |
 | `HO-0017` |     [Valentine](01-machines/01-easy/06-valentine/README.md)     | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | Heartbleed (CVE-2014-0160) → contraseña en memoria + clave SSH en directorio web → socket de `tmux` como root  |  🟠 Alto   |
+| `HO-0018` |     [Good Games](01-machines/01-easy/07-good-games/README.md)    | ![](https://img.shields.io/badge/Easy-38BDF8?style=flat-square) | SQLi en login → hash MD5 crackeado → SSTI Jinja2 (RCE) → escape de contenedor (montaje compartido + SUID)      | 🔴 Crítico |
 
 </div>
 
@@ -189,7 +190,7 @@ Laboratorios <b>que construyo yo mismo</b>, estilo HTB, para correr en local con
 ## 📊 Estadísticas
 
 <div align="center">
-  <img src="assets/diagrams/severidad.svg" alt="Hallazgos por severidad: 12 críticos, 22 altos, 10 medios, 1 bajo y 1 informativo" width="90%"/>
+  <img src="assets/diagrams/severidad.svg" alt="Hallazgos por severidad: 13 críticos, 24 altos, 11 medios, 1 bajo y 1 informativo" width="90%"/>
 </div>
 
 <br/>
@@ -198,7 +199,7 @@ Laboratorios <b>que construyo yo mismo</b>, estilo HTB, para correr en local con
 
 | Informes | Hallazgos totales | 🔴 Críticos | 🟠 Altos | 🟡 Medios | 🔵 Bajos | ⚪ Informativos |
 | :------: | :---------------: | :---------: | :------: | :-------: | :------: | :-------------: |
-|  **17**  |      **46**       |   **12**    |  **22**  |  **10**   |  **1**   |      **1**      |
+|  **18**  |      **50**       |   **13**    |  **24**  |  **11**   |  **1**   |      **1**      |
 
 </div>
 
@@ -211,10 +212,11 @@ Laboratorios <b>que construyo yo mismo</b>, estilo HTB, para correr en local con
 | :----------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
 | **Servicio expuesto sin autenticación**                | Fawn, Redeemer, Mongod, Synced                                                                               |
 | **Credenciales por defecto o débiles**                 | Meow, Preignition, Base, Bounty Hunter, Backstage                                                            |
-| **Crackeo offline de credenciales** (`john`/`hashcat`) | Backstage, Foundry, Switchboard, Traverxec                                                                   |
-| **Ejecución de código remoto (RCE)**                   | Inject, Shocker, FriendZone, Base, Traverxec                                                                 |
-| **Escalada de privilegios por mala configuración**     | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Traverxec, Valentine |
+| **Crackeo offline de credenciales** (`john`/`hashcat`) | Backstage, Foundry, Switchboard, Traverxec, Good Games                                                       |
+| **Ejecución de código remoto (RCE)**                   | Inject, Shocker, FriendZone, Base, Traverxec, Good Games                                                     |
+| **Escalada de privilegios por mala configuración**     | Cap, Shocker, Inject, FriendZone, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Traverxec, Valentine, Good Games |
 | **Divulgación de información / LFI / XXE**             | Cap, FriendZone, Inject, Base, Bounty Hunter, Backstage, Foundry, Switchboard, Valentine                     |
+| **Inyección en la aplicación (SQLi / SSTI)**           | Good Games                                                                                                   |
 
 </details>
 
